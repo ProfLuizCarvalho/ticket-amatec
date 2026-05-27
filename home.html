@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Sistema de Tickets</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Sistema de Tickets TI</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul id="sidebarNavList">
+                    <!-- Itens de navegação serão injetados aqui pelo JS -->
+                </ul>
+            </nav>
+            <!-- NOVO: Rodapé do Sidebar para a mensagem de boas-vindas -->
+            <div class="sidebar-footer">
+                <p>Bem-vindo(a),</p>
+                <p id="loggedInUserDisplay"></p>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="topbar">
+                <!-- REMOVIDO: <h1 id="welcomeMessage">Bem-vindo(a) ao Sistema de Tickets!</h1> -->
+                <!-- A topbar pode ficar vazia ou ter outros elementos, como um título da página atual -->
+                <h1 id="pageTitle"></h1> <!-- Novo elemento para o título da página atual -->
+            </header>
+
+            <div id="mainContentArea" class="main-content">
+                <!-- Conteúdo será carregado dinamicamente aqui -->
+            </div>
+        </main>
+    </div>
+
+    <script src="js/home.js"></script>
+</body>
+</html>

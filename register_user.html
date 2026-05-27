@@ -1,0 +1,69 @@
+<!-- register_user.html (FRAGMENTO HTML) -->
+
+<div class="main-content">
+    <div class="form-section">
+        <form id="userRegistrationForm" class="form-container">
+            <div class="form-header">
+                <h2>Formulário de Cadastro</h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="username">Nome de Usuário:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Senha:</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile">Perfil:</label>
+                    <select id="profile" name="profile" required>
+                        <option value="">Selecione um perfil</option>
+                        <option value="user">Cliente</option>
+                        <option value="technician">Técnico</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fullName">Nome Completo:</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <!-- ORDEM ALTERADA AQUI -->
+                <button type="button" id="editButton" class="btn btn-primary">Editar</button>
+                <button type="button" id="deleteButton" class="btn btn-danger">Excluir</button>
+                <button type="button" id="cancelButton" class="btn btn-secondary">Cancelar</button>
+                <button type="submit" id="saveButton" class="btn btn-success">Salvar</button>
+            </div>
+            <p id="formMessage" class="error-message"></p>
+        </form>
+    </div>
+
+    <div class="grid-section">
+        <h2>Usuários Cadastrados</h2>
+        <table id="userGrid" class="data-grid">
+            <thead>
+                <tr>
+                    <th>Nome de Usuário</th>
+                    <th>Perfil</th>
+                    <th>Nome Completo</th>
+                    <th>Email</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Linhas de usuários serão injetadas aqui pelo JS -->
+            </tbody>
+        </table>
+    </div>
+</div>

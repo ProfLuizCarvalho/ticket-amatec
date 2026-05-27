@@ -1,0 +1,78 @@
+<!-- register_product.html (FRAGMENTO HTML) -->
+
+<div class="main-content">
+    <div class="form-section">
+        <form id="productRegistrationForm" class="form-container">
+            <div class="form-header">
+                <h2>Formulário de Cadastro de Produto</h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="productId">ID do Produto:</label>
+                    <input type="text" id="productId" name="productId" required>
+                </div>
+                <div class="form-group">
+                    <label for="productName">Nome do Produto:</label>
+                    <input type="text" id="productName" name="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Categoria:</label>
+                    <select id="category" name="category" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="Hardware">Hardware</option>
+                        <option value="Software">Software</option>
+                        <option value="Servico">Serviço</option>
+                        <option value="Rede">Rede</option>
+                        <option value="Periferico">Periférico</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="price">Preço (R$):</label>
+                    <input type="number" id="price" name="price" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="stock">Estoque:</label>
+                    <input type="number" id="stock" name="stock" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="available">Disponível</option>
+                        <option value="unavailable">Indisponível</option>
+                        <option value="discontinued">Descontinuado</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <!-- ORDEM ALTERADA AQUI -->
+                <button type="button" id="editButton" class="btn btn-primary">Editar</button>
+                <button type="button" id="deleteButton" class="btn btn-danger">Excluir</button>
+                <button type="button" id="cancelButton" class="btn btn-secondary">Cancelar</button>
+                <button type="submit" id="saveButton" class="btn btn-success">Salvar</button>
+            </div>
+            <p id="formMessage" class="error-message"></p>
+        </form>
+    </div>
+
+    <div class="grid-section">
+        <h2>Produtos Cadastrados</h2>
+        <table id="productGrid" class="data-grid">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Linhas de produtos serão injetadas aqui pelo JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
