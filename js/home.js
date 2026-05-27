@@ -1,4 +1,4 @@
-// js/home.js - Versão Completa e Atualizada (com Cadastros de Usuários, Técnicos, Produtos e Clientes)
+// js/home.js - Versão Completa e Atualizada (com Cadastros de Usuários, Técnicos, Produtos, Clientes e Equipamentos)
 
 // Funções auxiliares para criar elementos HTML (para evitar repetição)
 function createDashboardSummary() {
@@ -35,8 +35,8 @@ async function loadContent(pageUrl, scriptUrl = null, pageTitleText = '') {
     mainContentArea.innerHTML = ''; // Limpa o conteúdo atual
 
     // Lógica para esconder/mostrar a topbar e o título
-    // Esconde se for 'Dashboard', 'Gerenciar Usuários', 'Gerenciar Técnicos', 'Gerenciar Produtos' ou 'Gerenciar Clientes'
-    if (pageTitleText === 'Dashboard' || pageTitleText === 'Gerenciar Usuários' || pageTitleText === 'Gerenciar Técnicos' || pageTitleText === 'Gerenciar Produtos' || pageTitleText === 'Gerenciar Clientes') {
+    // Esconde se for 'Dashboard', 'Gerenciar Usuários', 'Gerenciar Técnicos', 'Gerenciar Produtos', 'Gerenciar Clientes' ou 'Gerenciar Equipamentos'
+    if (pageTitleText === 'Dashboard' || pageTitleText === 'Gerenciar Usuários' || pageTitleText === 'Gerenciar Técnicos' || pageTitleText === 'Gerenciar Produtos' || pageTitleText === 'Gerenciar Clientes' || pageTitleText === 'Gerenciar Equipamentos') {
         if (topbarElement) topbarElement.style.display = 'none';
     } else { // Para outras páginas, mostra a topbar e define o título
         if (topbarElement) topbarElement.style.display = 'flex';
@@ -159,6 +159,7 @@ function initializePage() {
                             <button onclick="alert('Gerenciar Técnicos')">Gerenciar Técnicos</button>
                             <button onclick="alert('Gerenciar Clientes')">Gerenciar Clientes</button>
                             <button onclick="alert('Gerenciar Produtos')">Gerenciar Produtos</button>
+                            <button onclick="alert('Gerenciar Equipamentos')">Gerenciar Equipamentos</button>
                         `;
                         mainContentArea.appendChild(adminActions);
                     }
@@ -166,7 +167,7 @@ function initializePage() {
             } else { // Carrega o conteúdo de outras páginas
                 // Mostra a topbar e define o título para outras páginas, a menos que seja uma das páginas sem título
                 if (topbarElement) {
-                    if (text === 'Gerenciar Usuários' || text === 'Gerenciar Técnicos' || text === 'Gerenciar Produtos' || text === 'Gerenciar Clientes') {
+                    if (text === 'Gerenciar Usuários' || text === 'Gerenciar Técnicos' || text === 'Gerenciar Produtos' || text === 'Gerenciar Clientes' || text === 'Gerenciar Equipamentos') {
                         topbarElement.style.display = 'none';
                     } else {
                         topbarElement.style.display = 'flex';
@@ -206,6 +207,7 @@ function initializePage() {
             addMenuItem('Gerenciar Técnicos', 'register_technician.html', 'js/register_technician.js');
             addMenuItem('Gerenciar Clientes', 'register_client.html', 'js/register_client.js');
             addMenuItem('Gerenciar Produtos', 'register_product.html', 'js/register_product.js');
+            addMenuItem('Gerenciar Equipamentos', 'register_equipment.html', 'js/register_equipment.js'); // NOVO ITEM
             addMenuItem('Configurações', 'admin_settings.html', 'js/admin_settings.js');
             addMenuItem('Sair', '', null, false, 'logoutButton');
             break;

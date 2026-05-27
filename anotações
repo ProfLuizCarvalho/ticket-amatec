@@ -4,13 +4,12 @@ Funcionalidades Principais:
 
 ok***Cadastro de Usuário: Administradores, técnicos e clientes terão perfis com login e permissões definidas.
 ok***Cadastro de Cliente: Registro de clientes.
-Cadastro de Equipamento: Cada cliente terá um conjunto de equipamentos associados a ele. No momento da abertura do ticket, o cliente deverá selecionar, em um combo box, qual equipamento será atendido.
+ok***Cadastro de Equipamento: Cada cliente terá um conjunto de equipamentos associados a ele. 
 ok***Cadastro de Produto: Produtos ou serviços que podem ser vinculados às ordens.
 ok***Cadastro de Técnico: Registro de técnicos responsáveis pelos atendimentos.
 Abertura de Ticket: O cliente abre uma ordem, detalha o problema e escolhe, em um combo box, o equipamento associado.
 Recebimento de Ticket: O técnico visualiza os tickets, aceita, diagnostica e atualiza o status.
 Faturamento: O administrador gera faturas com base nas ordens finalizadas.
-Painel do Cliente: O cliente faz login, visualiza suas ordens e acompanha o status, podendo sempre escolher o equipamento vinculado ao ticket.
 Painel do Administrador/Técnico: Visão completa de todas as ordens, status e faturamento.
 
 Campos da Ordem de Serviço:

@@ -1,0 +1,116 @@
+<!-- register_equipment.html (FRAGMENTO HTML) - Versão Otimizada -->
+
+<div class="main-content">
+    <div class="form-section">
+        <form id="equipmentRegistrationForm" class="form-container">
+            <div class="form-header">
+                <h2>Formulário de Cadastro de Equipamento</h2>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="equipmentId">ID do Equipamento:</label>
+                    <input type="text" id="equipmentId" name="equipmentId" required>
+                </div>
+                <div class="form-group">
+                    <label for="registrationDate">Data de Cadastro:</label>
+                    <input type="date" id="registrationDate" name="registrationDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="purchaseDate">Data de Compra:</label>
+                    <input type="date" id="purchaseDate" name="purchaseDate">
+                </div>
+                <div class="form-group">
+                    <label for="equipmentType">Tipo:</label>
+                    <select id="equipmentType" name="equipmentType" required>
+                        <option value="">Selecione o Tipo</option>
+                        <option value="Rede">Rede</option>
+                        <option value="Terminal">Terminal</option>
+                        <option value="Impressora">Impressora</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="equipmentName">Nome:</label>
+                    <input type="text" id="equipmentName" name="equipmentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="brand">Marca:</label>
+                    <input type="text" id="brand" name="brand">
+                </div>
+                <div class="form-group">
+                    <label for="hasWarranty">Garantia:</label>
+                    <select id="hasWarranty" name="hasWarranty" required>
+                        <option value="">Selecione</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Nao">Não</option>
+                    </select>
+                </div>
+                <div class="form-group" id="warrantyEndDateGroup">
+                    <label for="warrantyEndDate">Data Fim da Garantia:</label>
+                    <input type="date" id="warrantyEndDate" name="warrantyEndDate">
+                </div>
+                <div class="form-group">
+                    <label for="usedValue">Valor Usado (R$):</label>
+                    <input type="number" id="usedValue" name="usedValue" step="0.01" min="0">
+                </div>
+
+                <!-- LINHA OTIMIZADA AQUI -->
+                <div class="form-group">
+                    <label for="patrimonyNumber">Patrimônio:</label>
+                    <input type="text" id="patrimonyNumber" name="patrimonyNumber">
+                </div>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="ativo">Ativo</option>
+                        <option value="manutencao">Em Manutenção</option>
+                        <option value="inativo">Inativo</option>
+                        <option value="desativado">Desativado</option>
+                    </select>
+                </div>
+                <div class="form-group"> <!-- Agora ocupa uma coluna na grid -->
+                    <label for="clientId">Cliente Vinculado:</label>
+                    <select id="clientId" name="clientId" required>
+                        <option value="">Selecione um Cliente</option>
+                        <!-- Opções de clientes serão carregadas via JS -->
+                    </select>
+                </div>
+                <!-- FIM DA LINHA OTIMIZADA -->
+
+                <div class="form-group form-group-full-width"> <!-- Este ainda ocupa a largura total para o nome do cliente -->
+                    <label for="clientNameDisplay">Nome do Cliente:</label>
+                    <input type="text" id="clientNameDisplay" name="clientNameDisplay" readonly disabled>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="editButton" class="btn btn-primary">Editar</button>
+                <button type="button" id="deleteButton" class="btn btn-danger">Excluir</button>
+                <button type="button" id="cancelButton" class="btn btn-secondary">Cancelar</button>
+                <button type="submit" id="saveButton" class="btn btn-success">Salvar</button>
+            </div>
+            <p id="formMessage" class="error-message"></p>
+        </form>
+    </div>
+
+    <div class="grid-section">
+        <h2>Equipamentos Cadastrados</h2>
+        <table id="equipmentGrid" class="data-grid">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Marca</th>
+                    <th>Cliente</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Linhas de equipamentos serão injetadas aqui pelo JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
