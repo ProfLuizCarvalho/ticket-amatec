@@ -1,0 +1,51 @@
+<!-- ticket_dashboard.html (FRAGMENTO HTML) - SEM o botão "Abrir Novo Ticket" -->
+
+<div class="main-content">
+    <div class="dashboard-header">
+        <h2>Painel de Tickets</h2>
+        <p>Visão geral dos tickets por status para acompanhamento rápido.</p>
+        <!-- BOTÃO "Abrir Novo Ticket" REMOVIDO DAQUI -->
+    </div>
+
+    <div class="ticket-boards-container">
+        <!-- Micropainel: Pendente -->
+        <div class="ticket-board pending-board">
+            <div class="board-header">
+                <h3>Pendente <span class="ticket-count" id="pendingCount">0</span></h3>
+            </div>
+            <div class="board-body" id="pendingTickets">
+                <!-- Tickets Pendentes serão carregados aqui -->
+            </div>
+        </div>
+
+        <!-- Micropainel: Em Andamento -->
+        <div class="ticket-board in-progress-board">
+            <div class="board-header">
+                <h3>Em Andamento <span class="ticket-count" id="inProgressCount">0</span></h3>
+            </div>
+            <div class="board-body" id="inProgressTickets">
+                <!-- Tickets Em Andamento serão carregados aqui -->
+            </div>
+        </div>
+
+        <!-- Micropainel: Aguardando Peça -->
+        <div class="ticket-board waiting-part-board">
+            <div class="board-header">
+                <h3>Aguardando Peça <span class="ticket-count" id="waitingPartCount">0</span></h3>
+            </div>
+            <div class="board-body" id="waitingPartTickets">
+                <!-- Tickets Aguardando Peça serão carregados aqui -->
+            </div>
+        </div>
+
+        <!-- Micropainel: Aguardando Aprovação -->
+        <div class="ticket-board waiting-approval-board">
+            <div class="board-header">
+                <h3>Aguardando Aprovação <span class="ticket-count" id="waitingApprovalCount">0</span></h3>
+            </div>
+            <div class="board-body" id="waitingApprovalTickets">
+                <!-- Tickets Aguardando Aprovação serão carregados aqui -->
+            </div>
+        </div>
+    </div>
+</div>

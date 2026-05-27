@@ -1,4 +1,4 @@
-// js/home.js - Versão Completa e Atualizada (com Cadastros de Usuários, Técnicos, Produtos, Clientes e Equipamentos)
+// js/home.js - Versão Corrigida com Painel de Tickets como item de menu separado
 
 // Funções auxiliares para criar elementos HTML (para evitar repetição)
 function createDashboardSummary() {
@@ -35,8 +35,8 @@ async function loadContent(pageUrl, scriptUrl = null, pageTitleText = '') {
     mainContentArea.innerHTML = ''; // Limpa o conteúdo atual
 
     // Lógica para esconder/mostrar a topbar e o título
-    // Esconde se for 'Dashboard', 'Gerenciar Usuários', 'Gerenciar Técnicos', 'Gerenciar Produtos', 'Gerenciar Clientes' ou 'Gerenciar Equipamentos'
-    if (pageTitleText === 'Dashboard' || pageTitleText === 'Gerenciar Usuários' || pageTitleText === 'Gerenciar Técnicos' || pageTitleText === 'Gerenciar Produtos' || pageTitleText === 'Gerenciar Clientes' || pageTitleText === 'Gerenciar Equipamentos') {
+    // Esconde se for 'Dashboard', 'Gerenciar Usuários', 'Gerenciar Técnicos', 'Gerenciar Produtos', 'Gerenciar Clientes', 'Gerenciar Equipamentos', 'Abrir Ticket', 'Gerenciar Tickets', 'Meus Tickets' ou 'Painel de Tickets'
+    if (pageTitleText === 'Dashboard' || pageTitleText === 'Gerenciar Usuários' || pageTitleText === 'Gerenciar Técnicos' || pageTitleText === 'Gerenciar Produtos' || pageTitleText === 'Gerenciar Clientes' || pageTitleText === 'Gerenciar Equipamentos' || pageTitleText === 'Abrir Ticket' || pageTitleText === 'Gerenciar Tickets' || pageTitleText === 'Meus Tickets' || pageTitleText === 'Painel de Tickets') {
         if (topbarElement) topbarElement.style.display = 'none';
     } else { // Para outras páginas, mostra a topbar e define o título
         if (topbarElement) topbarElement.style.display = 'flex';
@@ -167,7 +167,7 @@ function initializePage() {
             } else { // Carrega o conteúdo de outras páginas
                 // Mostra a topbar e define o título para outras páginas, a menos que seja uma das páginas sem título
                 if (topbarElement) {
-                    if (text === 'Gerenciar Usuários' || text === 'Gerenciar Técnicos' || text === 'Gerenciar Produtos' || text === 'Gerenciar Clientes' || text === 'Gerenciar Equipamentos') {
+                    if (text === 'Gerenciar Usuários' || text === 'Gerenciar Técnicos' || text === 'Gerenciar Produtos' || text === 'Gerenciar Clientes' || text === 'Gerenciar Equipamentos' || text === 'Abrir Ticket' || text === 'Gerenciar Tickets' || text === 'Meus Tickets' || text === 'Painel de Tickets') {
                         topbarElement.style.display = 'none';
                     } else {
                         topbarElement.style.display = 'flex';
@@ -186,28 +186,34 @@ function initializePage() {
     switch (userProfile) {
         case 'user':
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
+            addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js'); // Cliente pode abrir ticket
             addMenuItem('Meus Tickets', 'user_tickets.html', 'js/user_tickets.js'); // Exemplo futuro
-            addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js'); // Exemplo futuro
             addMenuItem('Sair', '', null, false, 'logoutButton');
             break;
 
         case 'technician':
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
-            addMenuItem('Todos os Tickets', 'all_tickets.html', 'js/all_tickets.js'); // Exemplo futuro
-            addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js');
+            // CORREÇÃO AQUI: "Gerenciar Tickets" volta a apontar para o formulário de CRUD
+            addMenuItem('Gerenciar Tickets', 'open_ticket.html', 'js/open_ticket.js');
+            // NOVO ITEM: "Painel de Tickets" aponta para o dashboard visual
+            addMenuItem('Painel de Tickets', 'ticket_dashboard.html', 'js/ticket_dashboard.js');
+            // "Abrir Ticket" continua oculto para técnico
             addMenuItem('Configurações', 'tech_settings.html', 'js/tech_settings.js');
             addMenuItem('Sair', '', null, false, 'logoutButton');
             break;
 
         case 'admin':
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
-            addMenuItem('Todos os Tickets', 'all_tickets.html', 'js/all_tickets.js');
-            addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js');
+            // CORREÇÃO AQUI: "Gerenciar Tickets" volta a apontar para o formulário de CRUD
+            addMenuItem('Gerenciar Tickets', 'open_ticket.html', 'js/open_ticket.js');
+            // NOVO ITEM: "Painel de Tickets" aponta para o dashboard visual
+            addMenuItem('Painel de Tickets', 'ticket_dashboard.html', 'js/ticket_dashboard.js');
+            // "Abrir Ticket" continua oculto para admin
             addMenuItem('Gerenciar Usuários', 'register_user.html', 'js/register_user.js');
             addMenuItem('Gerenciar Técnicos', 'register_technician.html', 'js/register_technician.js');
             addMenuItem('Gerenciar Clientes', 'register_client.html', 'js/register_client.js');
             addMenuItem('Gerenciar Produtos', 'register_product.html', 'js/register_product.js');
-            addMenuItem('Gerenciar Equipamentos', 'register_equipment.html', 'js/register_equipment.js'); // NOVO ITEM
+            addMenuItem('Gerenciar Equipamentos', 'register_equipment.html', 'js/register_equipment.js');
             addMenuItem('Configurações', 'admin_settings.html', 'js/admin_settings.js');
             addMenuItem('Sair', '', null, false, 'logoutButton');
             break;

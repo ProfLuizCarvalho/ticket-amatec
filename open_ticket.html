@@ -1,0 +1,142 @@
+<!-- open_ticket.html (FRAGMENTO HTML) -->
+
+<div class="main-content">
+    <div class="form-section">
+        <form id="ticketForm" class="form-container">
+            <div class="form-header">
+                <h2>Abertura de Ticket</h2>
+            </div>
+
+            <!-- Seção: Dados do Ticket (Preenchido na Abertura) -->
+            <div class="form-subsection-header">
+                <h3>Informações do Ticket</h3>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="ticketId">ID do Ticket:</label>
+                    <input type="text" id="ticketId" name="ticketId" required readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label for="openingDate">Data de Abertura:</label>
+                    <input type="date" id="openingDate" name="openingDate" required readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label for="clientId">Cliente:</label>
+                    <select id="clientId" name="clientId" required>
+                        <option value="">Selecione um Cliente</option>
+                        <!-- Clientes serão carregados via JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="equipmentId">Equipamento:</label>
+                    <select id="equipmentId" name="equipmentId" required>
+                        <option value="">Selecione um Equipamento</option>
+                        <!-- Equipamentos do cliente selecionado serão carregados via JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sector">Setor:</label>
+                    <input type="text" id="sector" name="sector" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label for="terminal">Terminal:</label>
+                    <input type="text" id="terminal" name="terminal" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label for="equipmentNumber">Número do Equipamento:</label>
+                    <input type="text" id="equipmentNumber" name="equipmentNumber" readonly disabled>
+                </div>
+                <div class="form-group form-group-full-width">
+                    <label for="problemDescription">Problema Relatado:</label>
+                    <textarea id="problemDescription" name="problemDescription" rows="3" required></textarea>
+                </div>
+            </div>
+
+            <!-- Seção: Dados do Atendimento (Preenchido pelo Técnico) -->
+            <div class="form-subsection-header">
+                <h3>Informações do Atendimento (Técnico)</h3>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="technicianId">Técnico Responsável:</label>
+                    <select id="technicianId" name="technicianId" disabled>
+                        <option value="">Selecione um Técnico</option>
+                        <!-- Técnicos serão carregados via JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="scheduledDate">Data de Agendamento:</label>
+                    <input type="date" id="scheduledDate" name="scheduledDate" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDate">Data de Atendimento:</label>
+                    <input type="date" id="serviceDate" name="serviceDate" disabled>
+                </div>
+                <div class="form-group form-group-full-width">
+                    <label for="diagnosis">Diagnóstico:</label>
+                    <textarea id="diagnosis" name="diagnosis" rows="3" disabled></textarea>
+                </div>
+                <div class="form-group form-group-full-width">
+                    <label for="solution">Solução:</label>
+                    <textarea id="solution" name="solution" rows="3" disabled></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="hasWarrantyTicket">Garantia (Ticket):</label>
+                    <select id="hasWarrantyTicket" name="hasWarrantyTicket" disabled>
+                        <option value="">Selecione</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Nao">Não</option>
+                    </select>
+                </div>
+                <div class="form-group" id="warrantyEndDateTicketGroup">
+                    <label for="warrantyEndDateTicket">Data Fim da Garantia (Ticket):</label>
+                    <input type="date" id="warrantyEndDateTicket" name="warrantyEndDateTicket" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="billingDueDate">Data de Vencimento para Faturamento:</label>
+                    <input type="date" id="billingDueDate" name="billingDueDate" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Aguardando Peça">Aguardando Peça</option>
+                        <option value="Aguardando Aprovação">Aguardando Aprovação</option>
+                        <option value="Finalizada">Finalizada</option>
+                        <option value="Faturada">Faturada</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="editButton" class="btn btn-primary">Editar</button>
+                <button type="button" id="deleteButton" class="btn btn-danger">Excluir</button>
+                <button type="button" id="cancelButton" class="btn btn-secondary">Cancelar</button>
+                <button type="submit" id="saveButton" class="btn btn-success">Salvar</button>
+            </div>
+            <p id="formMessage" class="error-message"></p>
+        </form>
+    </div>
+
+    <div class="grid-section">
+        <h2>Tickets Abertos</h2>
+        <table id="ticketGrid" class="data-grid">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Abertura</th>
+                    <th>Cliente</th>
+                    <th>Equipamento</th>
+                    <th>Problema</th>
+                    <th>Técnico</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Linhas de tickets serão injetadas aqui pelo JS -->
+            </tbody>
+        </table>
+    </div>
+</div>

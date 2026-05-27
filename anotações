@@ -7,8 +7,10 @@ ok***Cadastro de Cliente: Registro de clientes.
 ok***Cadastro de Equipamento: Cada cliente terá um conjunto de equipamentos associados a ele. 
 ok***Cadastro de Produto: Produtos ou serviços que podem ser vinculados às ordens.
 ok***Cadastro de Técnico: Registro de técnicos responsáveis pelos atendimentos.
-Abertura de Ticket: O cliente abre uma ordem, detalha o problema e escolhe, em um combo box, o equipamento associado.
-Recebimento de Ticket: O técnico visualiza os tickets, aceita, diagnostica e atualiza o status.
+ok***Abertura de Ticket: O cliente abre uma ordem, detalha o problema e escolhe, em um combo box, o equipamento associado.
+painel de Ticket: Painel para o técnico e adm - visualiza um painel de tickets. onde eles estao separados por micros paineis dentro desse painel maior.
+    sao 4 micros paineis. uma para ticket com status pendentes, outro com status em andamento, outro com status aguardando peça e o
+    ultimo com o status aguardando a aprovação. ele vai visualizar como se fosse um radar.
 Faturamento: O administrador gera faturas com base nas ordens finalizadas.
 Painel do Administrador/Técnico: Visão completa de todas as ordens, status e faturamento.
 
