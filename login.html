@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Tickets</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Adicione um link para Font Awesome para o ícone de engrenagem -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="login-container">
@@ -21,7 +23,46 @@
             <button type="submit">Entrar</button>
             <p id="errorMessage" class="error-message"></p>
         </form>
+
+        <!-- Ícone de Engrenagem para Configurações -->
+        <div class="settings-icon-container">
+            <i class="fas fa-cog" id="settingsIcon" title="Configurações do Banco de Dados"></i>
+        </div>
     </div>
+
+    <!-- Modal de Configuração do Banco de Dados -->
+    <div id="dbSettingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeDbSettingsModal">&times;</span>
+            <h3>Configurações de Conexão (Simulada)</h3>
+            <form id="dbSettingsForm">
+                <div class="input-group">
+                    <label for="dbHost">Host do Banco de Dados:</label>
+                    <input type="text" id="dbHost" name="dbHost" value="localhost">
+                </div>
+                <div class="input-group">
+                    <label for="dbPort">Porta:</label>
+                    <input type="text" id="dbPort" name="dbPort" value="3306">
+                </div>
+                <div class="input-group">
+                    <label for="dbName">Nome do Banco de Dados:</label>
+                    <input type="text" id="dbName" name="dbName" value="inner_ai_db">
+                </div>
+                <div class="input-group">
+                    <label for="dbUser">Usuário do Banco de Dados:</label>
+                    <input type="text" id="dbUser" name="dbUser" value="root">
+                </div>
+                <div class="input-group">
+                    <label for="dbPassword">Senha do Banco de Dados:</label>
+                    <input type="password" id="dbPassword" name="dbPassword" value="password">
+                </div>
+                <button type="button" id="testDbConnectionBtn" class="btn btn-secondary">Testar Conexão</button>
+                <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+                <p id="dbConnectionMessage" class="info-message"></p>
+            </form>
+        </div>
+    </div>
+
     <script src="js/login.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-// js/home.js - Versão COMPLETA e ATUALIZADA
+// js/home.js - Versão COMPLETA e ATUALIZADA (CORRIGIDA)
 
 document.addEventListener('DOMContentLoaded', initializePage);
 
@@ -109,7 +109,8 @@ function initializePage() {
                 mainContentArea.innerHTML = ''; // Limpa o conteúdo atual
                 mainContentArea.appendChild(createDashboardSummary());
                 mainContentArea.appendChild(createRecentTickets());
-                if (userProfile === 'technician') {
+                // Ações específicas para cada perfil na dashboard
+                if (userProfile === 'tecnico') { // <-- CORRIGIDO AQUI: 'tecnico'
                     const techActions = document.createElement('div');
                     techActions.innerHTML = `
                         <h3>Ações do Técnico</h3>
@@ -118,7 +119,7 @@ function initializePage() {
                         <button class="btn" onclick="loadContent('ticket_dashboard.html', 'js/ticket_dashboard.js', 'Painel de Tickets')">Ver Painel de Tickets</button>
                     `;
                     mainContentArea.appendChild(techActions);
-                } else if (userProfile === 'admin') {
+                } else if (userProfile === 'admin') { // 'admin' já estava correto
                     const adminActions = document.createElement('div');
                     adminActions.innerHTML = `
                         <h3>Ações do Administrador</h3>
@@ -133,6 +134,15 @@ function initializePage() {
                         <button class="btn" onclick="loadContent('register_equipment.html', 'js/register_equipment.js', 'Gerenciar Equipamentos')">Gerenciar Equipamentos</button>
                     `;
                     mainContentArea.appendChild(adminActions);
+                } else if (userProfile === 'cliente') { // <-- NOVO: Adicionado para cliente
+                    const clientActions = document.createElement('div');
+                    clientActions.innerHTML = `
+                        <h3>Ações do Cliente</h3>
+                        <button class="btn" onclick="loadContent('open_ticket.html', 'js/open_ticket.js', 'Abrir Novo Ticket')">Abrir Novo Ticket</button>
+                        <button class="btn" onclick="loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Meus Tickets')">Ver Meus Tickets</button>
+                        <button class="btn" onclick="loadContent('register_equipment.html', 'js/register_equipment.js', 'Meus Equipamentos')">Gerenciar Meus Equipamentos</button>
+                    `;
+                    mainContentArea.appendChild(clientActions);
                 }
             } else { // Carrega o conteúdo de outras páginas
                 loadContent(targetPage, scriptToLoad, text); // Passa o texto do menu como título da página
@@ -146,14 +156,15 @@ function initializePage() {
     let dashboardLink; // Variável para guardar o link da dashboard
 
     switch (userProfile) {
-        case 'user':
+        case 'cliente': // <-- CORRIGIDO AQUI: 'cliente'
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
             addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js'); // Cliente pode abrir ticket
             addMenuItem('Meus Tickets', 'manage_tickets.html', 'js/manage_tickets.js'); // Cliente vê seus tickets
+            addMenuItem('Meus Equipamentos', 'register_equipment.html', 'js/register_equipment.js'); // Cliente gerencia seus equipamentos
             addMenuItem('Sair', '', null, false, 'logoutButton');
             break;
 
-        case 'technician':
+        case 'tecnico': // <-- CORRIGIDO AQUI: 'tecnico'
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
             addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js');
             addMenuItem('Meus Tickets', 'manage_tickets.html', 'js/manage_tickets.js'); // Técnico vê seus tickets
@@ -162,12 +173,12 @@ function initializePage() {
             addMenuItem('Sair', '', null, false, 'logoutButton');
             break;
 
-        case 'admin':
+        case 'admin': // 'admin' já estava correto
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
             addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js');
             addMenuItem('Gerenciar Tickets', 'manage_tickets.html', 'js/manage_tickets.js'); // Admin gerencia todos os tickets
             addMenuItem('Painel de Tickets', 'ticket_dashboard.html', 'js/ticket_dashboard.js');
-            addMenuItem('Faturamento', 'billing_module.html', 'js/billing_module.js'); // NOVO ITEM AQUI
+            addMenuItem('Faturamento', 'billing_module.html', 'js/billing_module.js');
             addMenuItem('Gerenciar Usuários', 'register_user.html', 'js/register_user.js');
             addMenuItem('Gerenciar Técnicos', 'register_technician.html', 'js/register_technician.js');
             addMenuItem('Gerenciar Clientes', 'register_client.html', 'js/register_client.js');
