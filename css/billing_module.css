@@ -1,0 +1,331 @@
+/* css/billing_module.css */
+
+.billing-dashboard-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f4f7f6; /* Cor de fundo suave */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.billing-main-area {
+    flex: 2; /* Ocupa mais espaço */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.create-invoice-sidebar {
+    flex: 1; /* Ocupa menos espaço, como uma sidebar */
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+    position: relative; /* Para posicionar o botão de fechar */
+}
+
+/* --- Resumo de Faturamento --- */
+.billing-summary-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.summary-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 25px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 150px; /* Altura mínima para consistência */
+}
+
+.summary-card h3 {
+    margin-top: 0;
+    color: #555;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+.summary-card p.count-value {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #007bff; /* Cor principal */
+    margin: 0;
+}
+
+.summary-card .trend-indicator {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.summary-card .trend-indicator .arrow {
+    font-size: 1.2em;
+    margin-right: 5px;
+}
+
+.summary-card .trend-indicator .up {
+    color: #28a745; /* Verde para cima */
+}
+
+.summary-card .trend-indicator .down {
+    color: #dc3545; /* Vermelho para baixo */
+}
+
+.summary-card .chart-placeholder {
+    background-color: #e9ecef;
+    height: 50px;
+    border-radius: 4px;
+    margin-top: 15px;
+    /* Para simular um gráfico */
+}
+
+.summary-card .pie-chart-placeholder {
+    background-color: #e9ecef;
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    margin: 15px auto 10px;
+    /* Para simular um gráfico de pizza */
+}
+
+.summary-card .legend {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    font-size: 0.85em;
+}
+
+.summary-card .legend-item::before {
+    content: '•';
+    margin-right: 5px;
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+.summary-card .legend-item.paid::before { color: #28a745; }
+.summary-card .legend-item.pending::before { color: #ffc107; }
+.summary-card .legend-item.overdue::before { color: #dc3545; }
+
+
+/* --- Faturas Recentes --- */
+.recent-invoices-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+}
+
+.recent-invoices-section h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.recent-invoices-section .data-grid {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.recent-invoices-section .data-grid th,
+.recent-invoices-section .data-grid td {
+    border: 1px solid #e0e0e0;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.recent-invoices-section .data-grid th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #495057;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.recent-invoices-section .data-grid tbody tr:nth-child(even) {
+    background-color: #fefefe;
+}
+
+.recent-invoices-section .data-grid tbody tr:hover {
+    background-color: #f0f0f0;
+}
+
+.recent-invoices-section .data-grid .btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    border-radius: 5px;
+}
+
+/* Status da Fatura */
+.invoice-status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #fff;
+    font-size: 0.85em;
+    display: inline-block;
+    text-transform: uppercase;
+}
+.invoice-status.paid { background-color: #28a745; } /* Verde */
+.invoice-status.pending { background-color: #ffc107; color: #333; } /* Amarelo */
+.invoice-status.overdue { background-color: #dc3545; } /* Vermelho */
+.invoice-status.canceled { background-color: #6c757d; } /* Cinza */
+.invoice-status.draft { background-color: #17a2b8; } /* Azul claro */
+
+
+/* --- Criar Nova Fatura Sidebar --- */
+.create-invoice-sidebar h4 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.create-invoice-form-container .form-group {
+    margin-bottom: 15px;
+}
+
+.create-invoice-form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #495057;
+    font-size: 0.95em;
+}
+
+.create-invoice-form-container select,
+.create-invoice-form-container input[type="text"],
+.create-invoice-form-container input[type="date"],
+.create-invoice-form-container textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 0.95em;
+}
+
+.create-invoice-form-container .invoice-items-table {
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.create-invoice-form-container .invoice-items-table th,
+.create-invoice-form-container .invoice-items-table td {
+    padding: 8px 10px;
+    font-size: 0.9em;
+}
+
+.create-invoice-form-container .invoice-items-table th:last-child,
+.create-invoice-form-container .invoice-items-table td:last-child {
+    width: 50px; /* Para o botão de remover */
+    text-align: center;
+}
+
+.create-invoice-form-container .btn-sm {
+    margin-right: 10px;
+    margin-bottom: 15px;
+}
+
+.create-invoice-form-container .invoice-totals {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.create-invoice-form-container .invoice-totals p {
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1em;
+    color: #333;
+}
+
+.create-invoice-form-container .invoice-totals p span {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.create-invoice-form-container .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.create-invoice-form-container .form-actions .btn {
+    padding: 10px 20px;
+    font-size: 1em;
+}
+
+/* Botão de fechar a sidebar de criação de fatura */
+.close-preview-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5em;
+    color: #6c757d;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+}
+
+.close-preview-btn:hover {
+    color: #dc3545;
+}
+
+/* Estilos para o botão "Criar Nova Fatura" */
+.create-invoice-btn-container {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.create-invoice-btn-container .btn {
+    padding: 10px 20px;
+    font-size: 1em;
+}
+
+/* Responsividade básica */
+@media (max-width: 992px) {
+    .billing-dashboard-container {
+        flex-direction: column;
+    }
+    .billing-main-area, .create-invoice-sidebar {
+        flex: none;
+        width: 100%;
+    }
+    .summary-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}

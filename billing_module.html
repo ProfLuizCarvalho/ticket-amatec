@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo de Faturamento</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/billing_module.css"> <!-- Novo CSS para este módulo -->
+</head>
+<body>
+    <div class="main-content">
+        <div class="billing-dashboard-container">
+            <div class="billing-main-area">
+                <div class="billing-summary-section">
+                    <h2>Resumo de Faturamento</h2>
+                    <div class="summary-cards-grid">
+                        <div class="summary-card">
+                            <h3>Total Faturado este Mês</h3>
+                            <p id="totalBilledThisMonth" class="count-value">R$ 0,00</p>
+                            <div class="trend-indicator">
+                                <span class="arrow up">↑</span>
+                                <span class="percentage">0%</span>
+                            </div>
+                            <div class="chart-placeholder"></div>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Faturas Pendentes</h3>
+                            <p id="pendingInvoicesCount" class="count-value">0 faturas / R$ 0,00</p>
+                            <div class="chart-placeholder"></div>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Status das Faturas</h3>
+                            <div class="pie-chart-placeholder"></div>
+                            <div class="legend">
+                                <span class="legend-item paid">Pagos</span>
+                                <span class="legend-item pending">Pendentes</span>
+                                <span class="legend-item overdue">Vencidos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="billing-list-section">
+                    <h2>Lista de Faturas Recentes</h2>
+                    <table class="data-grid">
+                        <thead>
+                            <tr>
+                                <th>N° Fatura</th>
+                                <th>Cliente</th>
+                                <th>Projeto</th>
+                                <th>Data Emissão</th>
+                                <th>Data Vencimento</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentInvoicesTableBody">
+                            <!-- Faturas serão carregadas aqui via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="billing-sidebar-create-invoice">
+                <div class="create-invoice-header">
+                    <h3>Criar Nova Fatura</h3>
+                    <button id="newInvoiceBtn" class="btn btn-primary">Nova Fatura +</button>
+                </div>
+                <div id="createInvoiceFormContainer" class="create-invoice-form-container">
+                    <h4>Preview</h4>
+                    <span class="close-preview-btn" id="closeCreateInvoiceForm"></span>
+                    <div class="form-group">
+                        <label for="invoiceClientSelect">Cliente:</label>
+                        <select id="invoiceClientSelect" disabled>
+                            <option value="">Selecionar Cliente</option>
+                            <!-- Clientes serão carregados via JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceProjectSelect">Projeto:</label>
+                        <select id="invoiceProjectSelect" disabled>
+                            <option value="">Selecionar Projeto</option>
+                            <!-- Projetos serão carregados via JS -->
+                        </select>
+                    </div>
+
+                    <h4>Itens da Fatura</h4>
+                    <table class="data-grid invoice-items-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantidade</th>
+                                <th>Preço Unitário</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceItemsTableBody">
+                            <!-- Itens da fatura serão adicionados aqui via JS -->
+                        </tbody>
+                    </table>
+                    <button id="addInvoiceItemBtn" class="btn btn-secondary btn-sm" disabled>Adicionar Item</button>
+                    <button id="addTicketsToInvoiceBtn" class="btn btn-info btn-sm" disabled>Adicionar Tickets</button>
+
+
+                    <div class="invoice-totals">
+                        <p>Total Geral: <span id="invoiceTotalGeneral">R$ 0,00</span></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="invoicePaymentMethod">Forma de Pagamento:</label>
+                        <select id="invoicePaymentMethod" disabled>
+                            <option value="">Forma de Pagamento</option>
+                            <option value="Boleto">Boleto</option>
+                            <option value="Cartao">Cartão de Crédito</option>
+                            <option value="Pix">Pix</option>
+                            <option value="Transferencia">Transferência Bancária</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceNotes">Notas:</label>
+                        <textarea id="invoiceNotes" rows="3" disabled></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="saveInvoiceDraftBtn" class="btn btn-secondary" disabled>Salvar Rascunho</button>
+                        <button id="emitInvoiceBtn" class="btn btn-success" disabled>Emitir Fatura</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

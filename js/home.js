@@ -1,4 +1,4 @@
-// js/home.js - Versão Completa e Atualizada para as Novas Páginas
+// js/home.js - Versão COMPLETA e ATUALIZADA
 
 document.addEventListener('DOMContentLoaded', initializePage);
 
@@ -23,7 +23,8 @@ const loadContent = (page, script = null, title = '') => {
     }
     if (topbarElement) {
         // Ocultar topbar para certas páginas se desejar um layout diferente
-        if (['Gerenciar Usuários', 'Gerenciar Técnicos', 'Gerenciar Produtos', 'Gerenciar Clientes', 'Gerenciar Equipamentos', 'Abrir Ticket', 'Gerenciar Tickets', 'Meus Tickets', 'Painel de Tickets', 'Editar Ticket'].includes(title)) { // Adicionado 'Editar Ticket'
+        // Adicionado 'Editar Ticket' e 'Faturamento' à lista de páginas sem topbar
+        if (['Gerenciar Usuários', 'Gerenciar Técnicos', 'Gerenciar Produtos', 'Gerenciar Clientes', 'Gerenciar Equipamentos', 'Abrir Ticket', 'Gerenciar Tickets', 'Meus Tickets', 'Painel de Tickets', 'Editar Ticket', 'Faturamento'].includes(title)) {
             topbarElement.style.display = 'none';
         } else {
             topbarElement.style.display = 'flex';
@@ -113,7 +114,7 @@ function initializePage() {
                     techActions.innerHTML = `
                         <h3>Ações do Técnico</h3>
                         <button class="btn" onclick="loadContent('open_ticket.html', 'js/open_ticket.js', 'Abrir Ticket')">Abrir Novo Ticket</button>
-                        <button class="btn" onclick="loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Gerenciar Tickets')">Ver Meus Tickets</button>
+                        <button class="btn" onclick="loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Meus Tickets')">Ver Meus Tickets</button>
                         <button class="btn" onclick="loadContent('ticket_dashboard.html', 'js/ticket_dashboard.js', 'Painel de Tickets')">Ver Painel de Tickets</button>
                     `;
                     mainContentArea.appendChild(techActions);
@@ -124,6 +125,7 @@ function initializePage() {
                         <button class="btn" onclick="loadContent('open_ticket.html', 'js/open_ticket.js', 'Abrir Ticket')">Abrir Novo Ticket</button>
                         <button class="btn" onclick="loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Gerenciar Tickets')">Gerenciar Todos os Tickets</button>
                         <button class="btn" onclick="loadContent('ticket_dashboard.html', 'js/ticket_dashboard.js', 'Painel de Tickets')">Ver Painel de Tickets</button>
+                        <button class="btn" onclick="loadContent('billing_module.html', 'js/billing_module.js', 'Faturamento')">Gerenciar Faturamento</button>
                         <button class="btn" onclick="loadContent('register_user.html', 'js/register_user.js', 'Gerenciar Usuários')">Gerenciar Usuários</button>
                         <button class="btn" onclick="loadContent('register_technician.html', 'js/register_technician.js', 'Gerenciar Técnicos')">Gerenciar Técnicos</button>
                         <button class="btn" onclick="loadContent('register_client.html', 'js/register_client.js', 'Gerenciar Clientes')">Gerenciar Clientes</button>
@@ -165,6 +167,7 @@ function initializePage() {
             addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js');
             addMenuItem('Gerenciar Tickets', 'manage_tickets.html', 'js/manage_tickets.js'); // Admin gerencia todos os tickets
             addMenuItem('Painel de Tickets', 'ticket_dashboard.html', 'js/ticket_dashboard.js');
+            addMenuItem('Faturamento', 'billing_module.html', 'js/billing_module.js'); // NOVO ITEM AQUI
             addMenuItem('Gerenciar Usuários', 'register_user.html', 'js/register_user.js');
             addMenuItem('Gerenciar Técnicos', 'register_technician.html', 'js/register_technician.js');
             addMenuItem('Gerenciar Clientes', 'register_client.html', 'js/register_client.js');
