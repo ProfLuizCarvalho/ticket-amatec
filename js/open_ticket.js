@@ -1,9 +1,9 @@
-// js/open_ticket.js - Versão Completa com Seção de Produtos Vendidos e Cálculos de Desconto
+// js/open_ticket.js - Versão Atualizada (Apenas Formulário de Ticket)
 
 document.addEventListener('DOMContentLoaded', () => {
     const ticketForm = document.getElementById('ticketForm');
     const formMessage = document.getElementById('formMessage');
-    const ticketGridBody = document.querySelector('#ticketGrid tbody');
+    // REMOVIDO: const ticketGridBody = document.querySelector('#ticketGrid tbody');
 
     const saveButton = document.getElementById('saveButton');
     const editButton = document.getElementById('editButton');
@@ -37,14 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const productIdSelect = document.getElementById('productId');
     const productQuantityInput = document.getElementById('productQuantity');
     const productUnitPriceInput = document.getElementById('productUnitPrice'); // Preço Unitário Original
-    const productDiscountInput = document.getElementById('productDiscount'); // NOVO: Desconto (%)
-    const productUnitPriceWithDiscountInput = document.getElementById('productUnitPriceWithDiscount'); // NOVO: Preço Unitário com Desconto
+    const productDiscountInput = document.getElementById('productDiscount'); // Desconto (%)
+    const productUnitPriceWithDiscountInput = document.getElementById('productUnitPriceWithDiscount'); // Preço Unitário com Desconto
     const productTotalPriceInput = document.getElementById('productTotalPrice'); // Total do Item com Desconto
     const addProductBtn = document.getElementById('addProductBtn');
     const productsTableBody = document.querySelector('#productsTable tbody');
-    const productsSubtotalOriginalDisplay = document.getElementById('productsSubtotalOriginal'); // NOVO: Subtotal Original
-    const productsTotalDiscountDisplay = document.getElementById('productsTotalDiscount'); // NOVO: Total de Desconto
-    const productsSubtotalWithDiscountDisplay = document.getElementById('productsSubtotalWithDiscount'); // NOVO: Subtotal com Desconto
+    const productsSubtotalOriginalDisplay = document.getElementById('productsSubtotalOriginal'); // Subtotal Original
+    const productsTotalDiscountDisplay = document.getElementById('productsTotalDiscount'); // Total de Desconto
+    const productsSubtotalWithDiscountDisplay = document.getElementById('productsSubtotalWithDiscount'); // Subtotal com Desconto
 
     let editingTicketId = null;
     let allClients = {};
@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTicketProducts = []; 
 
     const loggedInUserProfile = localStorage.getItem('userProfile'); // Perfil do usuário logado
+    const loggedInUser = localStorage.getItem('loggedInUser'); // Nome de usuário logado
 
     // --- Funções de Carregamento/Salvamento ---
     const loadTickets = () => JSON.parse(localStorage.getItem('appTickets')) || {};
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Popula o select de técnicos
     const populateTechnicianSelect = () => {
         allTechnicians = loadTechnicians();
-        technicianIdSelect.innerHTML = '<option value="">Selecione um Técnico</option>';
+        technicianIdSelect.innerHTML = '<option value="" disabled selected>Selecione um Técnico</option>'; // Adicionado disabled selected
         const technicianArray = Object.keys(allTechnicians).map(id => ({ id, ...allTechnicians[id] }));
         technicianArray.sort((a, b) => a.fullName.localeCompare(b.fullName));
         technicianArray.forEach(tech => {
@@ -90,20 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
             option.value = tech.id;
             option.textContent = tech.fullName;
             technicianIdSelect.appendChild(option);
-        });
-    };
-
-    // Popula o select de produtos
-    const populateProductSelect = () => {
-        allProducts = loadProducts();
-        productIdSelect.innerHTML = '<option value="">Selecione um Produto</option>';
-        const productArray = Object.keys(allProducts).map(id => ({ id, ...allProducts[id] }));
-        productArray.sort((a, b) => a.productName.localeCompare(b.productName));
-        productArray.forEach(product => {
-            const option = document.createElement('option');
-            option.value = product.id;
-            option.textContent = product.productName;
-            productIdSelect.appendChild(option);
         });
     };
 
@@ -132,10 +119,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateEquipmentDetails = () => {
         const selectedEquipmentId = equipmentIdSelect.value;
         if (selectedEquipmentId && allEquipments[selectedEquipmentId]) {
-            const equipment = allEquipments[selectedEquipmentId];
-            sectorInput.value = equipment.sector || '';
-            terminalInput.value = equipment.terminal || '';
-            equipmentNumberInput.value = equipment.equipmentNumber || '';
+            const eq = allEquipments[selectedEquipmentId];
+            sectorInput.value = eq.sector || ''; 
+            terminalInput.value = eq.terminal || ''; 
+            equipmentNumberInput.value = eq.patrimonyNumber || eq.id;
         } else {
             sectorInput.value = '';
             terminalInput.value = '';
@@ -143,36 +130,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Habilita/desabilita o campo de data fim da garantia do ticket
+    // Alterna a visibilidade do campo de Data Fim da Garantia do Ticket
     const toggleWarrantyEndDateTicketField = () => {
         if (hasWarrantyTicketSelect.value === 'Sim') {
-            warrantyEndDateTicketInput.disabled = false;
             warrantyEndDateTicketGroup.style.display = 'block';
         } else {
-            warrantyEndDateTicketInput.disabled = true;
-            warrantyEndDateTicketInput.value = '';
             warrantyEndDateTicketGroup.style.display = 'none';
+            warrantyEndDateTicketInput.value = ''; // Limpa o valor se não houver garantia
         }
     };
 
-    // Calcula e atualiza os campos de preço e total do item
+    // Popula o select de produtos
+    const populateProductSelect = () => {
+        allProducts = loadProducts();
+        productIdSelect.innerHTML = '<option value="">Selecione um Produto</option>';
+        const productArray = Object.keys(allProducts).map(id => ({ id, ...allProducts[id] }));
+        productArray.sort((a, b) => a.productName.localeCompare(b.productName));
+        productArray.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.productName;
+            productIdSelect.appendChild(option);
+        });
+    };
+
+    // Atualiza os campos de preço unitário, desconto e total do item de produto
     const updateProductPriceFields = () => {
         const selectedProductId = productIdSelect.value;
-        const quantity = parseFloat(productQuantityInput.value) || 0;
-        const discount = parseFloat(productDiscountInput.value) || 0; // Desconto em %
+        const quantity = parseInt(productQuantityInput.value) || 0;
+        const discountPercent = parseFloat(productDiscountInput.value) || 0;
+        const product = allProducts[selectedProductId];
 
-        if (selectedProductId && allProducts[selectedProductId]) {
-            const product = allProducts[selectedProductId];
-            const unitPriceOriginal = parseFloat(product.price) || 0;
-
-            // Calcula o preço unitário com desconto
-            const unitPriceWithDiscount = unitPriceOriginal * (1 - (discount / 100));
-            // Calcula o total do item com desconto
-            const itemTotalPrice = unitPriceWithDiscount * quantity;
+        if (product && quantity > 0) {
+            const unitPriceOriginal = parseFloat(product.salePrice);
+            const discountFactor = 1 - (discountPercent / 100);
+            const unitPriceWithDiscount = unitPriceOriginal * discountFactor;
+            const totalPriceWithDiscount = unitPriceWithDiscount * quantity;
 
             productUnitPriceInput.value = unitPriceOriginal.toFixed(2);
             productUnitPriceWithDiscountInput.value = unitPriceWithDiscount.toFixed(2);
-            productTotalPriceInput.value = itemTotalPrice.toFixed(2);
+            productTotalPriceInput.value = totalPriceWithDiscount.toFixed(2);
         } else {
             productUnitPriceInput.value = '0.00';
             productUnitPriceWithDiscountInput.value = '0.00';
@@ -183,37 +180,56 @@ document.addEventListener('DOMContentLoaded', () => {
     // Adiciona um produto à lista de produtos do ticket
     const addProductToTicket = () => {
         const selectedProductId = productIdSelect.value;
-        const quantity = parseFloat(productQuantityInput.value);
-        const discount = parseFloat(productDiscountInput.value); // Desconto em %
+        const quantity = parseInt(productQuantityInput.value) || 0;
+        const discountPercent = parseFloat(productDiscountInput.value) || 0;
 
-        if (!selectedProductId || !quantity || quantity <= 0) {
-            alert('Por favor, selecione um produto e informe uma quantidade válida.');
+        if (!selectedProductId || quantity <= 0) {
+            formMessage.textContent = 'Selecione um produto e uma quantidade válida.';
+            formMessage.classList.remove('success-message');
+            formMessage.classList.add('error-message');
             return;
         }
 
         const product = allProducts[selectedProductId];
-        const unitPriceOriginal = parseFloat(product.price);
-        const unitPriceWithDiscount = unitPriceOriginal * (1 - (discount / 100));
-        const itemTotalPrice = unitPriceWithDiscount * quantity;
+        if (!product) {
+            formMessage.textContent = 'Produto não encontrado.';
+            formMessage.classList.remove('success-message');
+            formMessage.classList.add('error-message');
+            return;
+        }
+
+        const unitPriceOriginal = parseFloat(product.salePrice);
+        const discountFactor = 1 - (discountPercent / 100);
+        const unitPriceWithDiscount = unitPriceOriginal * discountFactor;
+        const subtotalWithDiscount = unitPriceWithDiscount * quantity;
+        const totalDiscountValue = (unitPriceOriginal * quantity) - subtotalWithDiscount;
 
         const newProductItem = {
-            productId: selectedProductId,
+            productId: product.id,
             productName: product.productName,
             quantity: quantity,
             unitPriceOriginal: unitPriceOriginal,
-            discount: discount, // Armazena o percentual de desconto
+            discountPercent: discountPercent,
             unitPriceWithDiscount: unitPriceWithDiscount,
-            totalPrice: itemTotalPrice
+            subtotalWithDiscount: subtotalWithDiscount,
+            totalDiscountValue: totalDiscountValue
         };
 
-        currentTicketProducts.push(newProductItem);
-        renderProductsTable();
+        // Verifica se o produto já existe na lista e atualiza
+        const existingProductIndex = currentTicketProducts.findIndex(item => item.productId === newProductItem.productId);
+        if (existingProductIndex > -1) {
+            currentTicketProducts[existingProductIndex] = newProductItem;
+        } else {
+            currentTicketProducts.push(newProductItem);
+        }
 
-        // Reseta os campos de adição de produto
+        renderProductsTable();
+        // Limpa os campos de adição após adicionar
         productIdSelect.value = '';
         productQuantityInput.value = '1';
         productDiscountInput.value = '0';
-        updateProductPriceFields(); // Limpa os campos de preço
+        updateProductPriceFields(); // Reseta os campos de preço
+        formMessage.textContent = ''; // Limpa mensagem de erro
     };
 
     // Remove um produto da lista de produtos do ticket
@@ -225,29 +241,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // Renderiza a tabela de produtos vendidos
     const renderProductsTable = () => {
         productsTableBody.innerHTML = '';
-        let subtotalOriginal = 0;
-        let totalDiscountAmount = 0;
-        let subtotalWithDiscount = 0;
+        let totalSubtotalOriginal = 0;
+        let totalDiscount = 0;
+        let totalSubtotalWithDiscount = 0;
+
+        if (currentTicketProducts.length === 0) {
+            const row = productsTableBody.insertRow();
+            row.innerHTML = `<td colspan="7">Nenhum produto adicionado.</td>`;
+            productsSubtotalOriginalDisplay.textContent = 'R$ 0.00';
+            productsTotalDiscountDisplay.textContent = 'R$ 0.00';
+            productsSubtotalWithDiscountDisplay.textContent = 'R$ 0.00';
+            return;
+        }
 
         currentTicketProducts.forEach((item, index) => {
             const row = productsTableBody.insertRow();
+            const subtotalOriginalItem = item.unitPriceOriginal * item.quantity;
+
+            totalSubtotalOriginal += subtotalOriginalItem;
+            totalDiscount += item.totalDiscountValue;
+            totalSubtotalWithDiscount += item.subtotalWithDiscount;
+
             row.innerHTML = `
                 <td>${item.productName}</td>
                 <td>${item.quantity}</td>
                 <td>R$ ${item.unitPriceOriginal.toFixed(2)}</td>
-                <td>${item.discount.toFixed(0)}%</td>
+                <td>${item.discountPercent.toFixed(2)}%</td>
                 <td>R$ ${item.unitPriceWithDiscount.toFixed(2)}</td>
-                <td>R$ ${item.totalPrice.toFixed(2)}</td>
-                <td><button type="button" class="btn btn-danger btn-sm remove-product-btn" data-index="${index}">Remover</button></td>
+                <td>R$ ${item.subtotalWithDiscount.toFixed(2)}</td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-product-btn" data-index="${index}">Remover</button>
+                </td>
             `;
-            subtotalOriginal += item.unitPriceOriginal * item.quantity;
-            totalDiscountAmount += (item.unitPriceOriginal * item.quantity) - item.totalPrice;
-            subtotalWithDiscount += item.totalPrice;
         });
 
-        productsSubtotalOriginalDisplay.textContent = `R$ ${subtotalOriginal.toFixed(2)}`;
-        productsTotalDiscountDisplay.textContent = `R$ ${totalDiscountAmount.toFixed(2)}`;
-        productsSubtotalWithDiscountDisplay.textContent = `R$ ${subtotalWithDiscount.toFixed(2)}`;
+        productsSubtotalOriginalDisplay.textContent = `R$ ${totalSubtotalOriginal.toFixed(2)}`;
+        productsTotalDiscountDisplay.textContent = `R$ ${totalDiscount.toFixed(2)}`;
+        productsSubtotalWithDiscountDisplay.textContent = `R$ ${totalSubtotalWithDiscount.toFixed(2)}`;
 
         // Adiciona event listeners para os botões de remover
         productsTableBody.querySelectorAll('.remove-product-btn').forEach(button => {
@@ -268,56 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
         return `TICKET-${year}${month}${day}-${hours}${minutes}${seconds}`;
-    };
-
-    // Renderiza a grid de tickets
-    const renderTicketGrid = () => {
-        ticketGridBody.innerHTML = '';
-        const tickets = loadTickets();
-        const ticketArray = Object.values(tickets);
-
-        // Filtra tickets para o cliente logado, se for perfil 'user'
-        let filteredTickets = ticketArray;
-        if (loggedInUserProfile === 'user') {
-            const loggedInUser = localStorage.getItem('loggedInUser');
-            const clients = loadClients();
-            const client = Object.values(clients).find(c => c.clientUser === loggedInUser);
-            if (client) {
-                filteredTickets = ticketArray.filter(ticket => ticket.clientId === client.id);
-            } else {
-                filteredTickets = []; // Se o usuário logado não for um cliente, não mostra tickets
-            }
-        }
-
-        filteredTickets.sort((a, b) => new Date(b.openingDate) - new Date(a.openingDate)); // Ordena por data de abertura
-
-        if (filteredTickets.length === 0) {
-            const row = ticketGridBody.insertRow();
-            row.innerHTML = `<td colspan="8">Nenhum ticket encontrado.</td>`;
-            return;
-        }
-
-        filteredTickets.forEach(ticket => {
-            const row = ticketGridBody.insertRow();
-            row.dataset.ticketId = ticket.id; // Adiciona o ID do ticket como data attribute
-            const client = allClients[ticket.clientId];
-            const equipment = allEquipments[ticket.equipmentId];
-            const technician = allTechnicians[ticket.technicianId];
-
-            row.innerHTML = `
-                <td>${ticket.id}</td>
-                <td>${ticket.openingDate}</td>
-                <td>${client ? (client.clientName || client.tradeName) : 'N/A'}</td>
-                <td>${equipment ? equipment.equipmentName : 'N/A'}</td>
-                <td>${ticket.problemDescription.substring(0, 50)}...</td>
-                <td>${technician ? technician.fullName : 'N/A'}</td>
-                <td>${ticket.status}</td>
-                <td>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="editTicket('${ticket.id}')">Editar</button>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteTicket('${ticket.id}')">Excluir</button>
-                </td>
-            `;
-        });
     };
 
     // Preenche o formulário para edição de um ticket existente
@@ -386,32 +366,79 @@ document.addEventListener('DOMContentLoaded', () => {
             formMessage.textContent = '';
         } else {
             alert('Ticket não encontrado.');
+            resetForm(); // Reseta o formulário se o ticket não for encontrado
         }
     };
 
-    // Exclui um ticket
+    // Exclui um ticket (agora esta função é chamada apenas pelo botão de delete no formulário de edição)
     const deleteTicket = (id) => {
-        if (confirm(`Tem certeza que deseja excluir o ticket ${id}?`)) {
+        if (confirm(`Tem certeza que deseja excluir o ticket "${id}"?`)) {
             let tickets = loadTickets();
             delete tickets[id];
             saveTickets(tickets);
             formMessage.textContent = `Ticket "${id}" excluído com sucesso!`;
             formMessage.classList.remove('error-message');
             formMessage.classList.add('success-message');
-            renderTicketGrid();
-            resetForm();
+            resetForm(); // Reseta o formulário após exclusão
+            // O ideal aqui seria redirecionar para a lista de tickets
+            // loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Gerenciar Tickets');
         }
+    };
+
+    // Reseta o formulário para o estado inicial (novo ticket)
+    const resetForm = () => {
+        ticketForm.reset();
+        ticketIdInput.value = generateTicketId();
+        openingDateInput.value = new Date().toISOString().split('T')[0];
+        currentTicketProducts = [];
+        renderProductsTable();
+
+        // Habilita todos os campos para um novo ticket (Admin/Tecnico ou Cliente abrindo)
+        ticketIdInput.disabled = true; // ID sempre desabilitado
+        openingDateInput.disabled = true; // Data de abertura sempre desabilitada
+        clientIdSelect.disabled = false;
+        equipmentIdSelect.disabled = false;
+        problemDescriptionTextarea.disabled = false;
+
+        // Campos de atendimento técnico (desabilitados por padrão para novo ticket)
+        technicianIdSelect.disabled = true;
+        scheduledDateInput.disabled = true;
+        serviceDateInput.disabled = true;
+        diagnosisTextarea.disabled = true;
+        solutionTextarea.disabled = true;
+        hasWarrantyTicketSelect.disabled = true;
+        warrantyEndDateTicketInput.disabled = true;
+        billingDueDateInput.disabled = true;
+        statusSelect.disabled = true; // Status inicial é "Pendente" ou "Aguardando Aprovação"
+
+        // Campos de produto
+        productIdSelect.disabled = false;
+        productQuantityInput.disabled = false;
+        productDiscountInput.disabled = false; // Habilita o campo de desconto
+        addProductBtn.disabled = false;
+        productsTableBody.querySelectorAll('.remove-product-btn').forEach(btn => btn.disabled = false);
+
+        // Botões de ação
+        saveButton.style.display = 'inline-block';
+        editButton.style.display = 'none';
+        deleteButton.style.display = 'none';
+        cancelButton.style.display = 'none';
+
+        editingTicketId = null;
+        formMessage.textContent = '';
+
+        populateEquipmentSelect(); // Limpa e repopula equipamentos
+        toggleWarrantyEndDateTicketField(); // Esconde o campo de data de garantia do ticket
     };
 
     // --- Inicialização e Event Listeners ---
 
-    // Popula selects e renderiza grid ao carregar a página
+    // Popula selects
     populateClientSelect();
     populateTechnicianSelect();
     populateProductSelect(); 
-    renderTicketGrid();
 
-    // Verifica se há um ticket para edição vindo do dashboard
+    // Verifica se há um ticket para edição vindo do localStorage (da lista de tickets)
     const ticketToEditId = localStorage.getItem('ticketToEditId');
     if (ticketToEditId) {
         editTicket(ticketToEditId);
@@ -428,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listeners para a seção de produtos
     productIdSelect.addEventListener('change', updateProductPriceFields);
     productQuantityInput.addEventListener('input', updateProductPriceFields);
-    productDiscountInput.addEventListener('input', updateProductPriceFields); // NOVO: Evento para o campo de desconto
+    productDiscountInput.addEventListener('input', updateProductPriceFields);
     addProductBtn.addEventListener('click', addProductToTicket);
 
     // Event Listener para o formulário (Salvar/Atualizar)
@@ -516,8 +543,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         formMessage.classList.remove('error-message');
         formMessage.classList.add('success-message');
-        renderTicketGrid();
+        // Após salvar/atualizar, o ideal é redirecionar para a lista de tickets ou resetar o formulário
         resetForm();
+        // Se você quiser redirecionar para a lista de tickets após salvar/atualizar:
+        // loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Gerenciar Tickets');
     });
 
     // Event Listeners para os botões de ação
@@ -532,20 +561,16 @@ document.addEventListener('DOMContentLoaded', () => {
         formMessage.textContent = 'Operação cancelada.';
         formMessage.classList.remove('success-message');
         formMessage.classList.add('error-message');
+        // Se estiver em modo de edição e cancelar, pode ser útil voltar para a lista
+        // if (editingTicketId) {
+        //     loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Gerenciar Tickets');
+        // }
     });
 
     deleteButton.addEventListener('click', (event) => {
         event.preventDefault();
         if (editingTicketId) {
             deleteTicket(editingTicketId);
-        }
-    });
-
-    // Event listener para cliques nas linhas da grid para edição
-    ticketGridBody.addEventListener('click', (event) => {
-        const row = event.target.closest('tr');
-        if (row && row.dataset.ticketId) {
-            editTicket(row.dataset.ticketId);
         }
     });
 });

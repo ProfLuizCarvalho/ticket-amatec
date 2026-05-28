@@ -1,51 +1,105 @@
-<!-- ticket_dashboard.html (FRAGMENTO HTML) - SEM o botão "Abrir Novo Ticket" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Tickets</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <!-- NOVO: Referência ao CSS específico do painel -->
+    <link rel="stylesheet" href="css/ticket_dashboard.css"> 
+</head>
+<body>
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h2>Painel de Tickets</h2>
+            <button id="refreshDashboardBtn" class="btn btn-secondary">Atualizar Painel</button>
+        </div>
 
-<div class="main-content">
-    <div class="dashboard-header">
-        <h2>Painel de Tickets</h2>
-        <p>Visão geral dos tickets por status para acompanhamento rápido.</p>
-        <!-- BOTÃO "Abrir Novo Ticket" REMOVIDO DAQUI -->
+        <div class="dashboard-summary-cards">
+            <div class="summary-card">
+                <h3>Tickets Pendentes</h3>
+                <p id="pendingTicketsCount" class="count">0</p>
+            </div>
+            <div class="summary-card">
+                <h3>Tickets Em Andamento</h3>
+                <p id="inProgressTicketsCount" class="count">0</p>
+            </div>
+            <div class="summary-card">
+                <h3>Aguardando Aprovação</h3>
+                <p id="awaitingApprovalTicketsCount" class="count">0</p>
+            </div>
+            <div class="summary-card">
+                <h3>Tickets Finalizados (Hoje)</h3>
+                <p id="finishedTodayTicketsCount" class="count">0</p>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <h3>Filtros</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label for="filterStatus">Status:</label>
+                    <select id="filterStatus">
+                        <option value="">Todos</option>
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Aguardando Peça">Aguardando Peça</option>
+                        <option value="Aguardando Aprovação">Aguardando Aprovação</option>
+                        <option value="Finalizada">Finalizada</option>
+                        <option value="Faturada">Faturada</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filterTechnician">Técnico:</label>
+                    <select id="filterTechnician">
+                        <option value="">Todos</option>
+                        <!-- Técnicos serão carregados via JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filterClient">Cliente:</label>
+                    <input type="text" id="filterClient" placeholder="Nome do Cliente">
+                </div>
+                <div class="form-group">
+                    <label for="filterEquipment">Equipamento:</label>
+                    <input type="text" id="filterEquipment" placeholder="Nome/ID do Equipamento">
+                </div>
+                <div class="form-group">
+                    <label for="filterOpeningDateStart">Data Abertura (Início):</label>
+                    <input type="date" id="filterOpeningDateStart">
+                </div>
+                <div class="form-group">
+                    <label for="filterOpeningDateEnd">Data Abertura (Fim):</label>
+                    <input type="date" id="filterOpeningDateEnd">
+                </div>
+            </div>
+            <div class="filters-actions">
+                <button id="applyFiltersBtn" class="btn btn-primary">Aplicar Filtros</button>
+                <button id="clearFiltersBtn" class="btn btn-secondary">Limpar Filtros</button>
+            </div>
+        </div>
+
+        <div class="tickets-list-section">
+            <h3>Tickets Encontrados</h3>
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data Abertura</th>
+                        <th>Cliente</th>
+                        <th>Equipamento</th>
+                        <th>Técnico</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="ticketDashboardGridBody">
+                    <!-- Tickets serão carregados aqui via JS -->
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <div class="ticket-boards-container">
-        <!-- Micropainel: Pendente -->
-        <div class="ticket-board pending-board">
-            <div class="board-header">
-                <h3>Pendente <span class="ticket-count" id="pendingCount">0</span></h3>
-            </div>
-            <div class="board-body" id="pendingTickets">
-                <!-- Tickets Pendentes serão carregados aqui -->
-            </div>
-        </div>
-
-        <!-- Micropainel: Em Andamento -->
-        <div class="ticket-board in-progress-board">
-            <div class="board-header">
-                <h3>Em Andamento <span class="ticket-count" id="inProgressCount">0</span></h3>
-            </div>
-            <div class="board-body" id="inProgressTickets">
-                <!-- Tickets Em Andamento serão carregados aqui -->
-            </div>
-        </div>
-
-        <!-- Micropainel: Aguardando Peça -->
-        <div class="ticket-board waiting-part-board">
-            <div class="board-header">
-                <h3>Aguardando Peça <span class="ticket-count" id="waitingPartCount">0</span></h3>
-            </div>
-            <div class="board-body" id="waitingPartTickets">
-                <!-- Tickets Aguardando Peça serão carregados aqui -->
-            </div>
-        </div>
-
-        <!-- Micropainel: Aguardando Aprovação -->
-        <div class="ticket-board waiting-approval-board">
-            <div class="board-header">
-                <h3>Aguardando Aprovação <span class="ticket-count" id="waitingApprovalCount">0</span></h3>
-            </div>
-            <div class="board-body" id="waitingApprovalTickets">
-                <!-- Tickets Aguardando Aprovação serão carregados aqui -->
-            </div>
-        </div>
-    </div>
-</div>
+</body>
+</html>

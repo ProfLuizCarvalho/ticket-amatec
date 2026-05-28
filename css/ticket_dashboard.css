@@ -1,130 +1,158 @@
 /* css/ticket_dashboard.css */
 
 .dashboard-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.dashboard-header h2 {
-    margin-top: 0;
-    color: #333;
-}
-
-.dashboard-header p {
-    color: #666;
-    font-size: 1.1em;
-}
-
-.ticket-boards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 4 colunas, responsivo */
-    gap: 20px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-.ticket-board {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 300px; /* Altura mínima para os painéis */
-}
-
-.board-header {
-    padding: 15px;
-    color: white;
-    font-weight: bold;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 20px;
 }
 
-.board-header h3 {
+.dashboard-header h2 {
     margin: 0;
-    font-size: 1.2em;
+    color: #333;
 }
 
-.ticket-count {
-    background-color: rgba(255, 255, 255, 0.3);
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.9em;
+.dashboard-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
-/* Cores para cada tipo de painel */
-.pending-board .board-header { background-color: #ffc107; /* Amarelo */ }
-.in-progress-board .board-header { background-color: #007bff; /* Azul */ }
-.waiting-part-board .board-header { background-color: #6c757d; /* Cinza */ }
-.waiting-approval-board .board-header { background-color: #17a2b8; /* Ciano */ }
-
-
-.board-body {
-    padding: 15px;
-    flex-grow: 1; /* Faz o corpo ocupar o espaço restante */
-    overflow-y: auto; /* Adiciona scroll se houver muitos tickets */
+.summary-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
 }
 
-.ticket-card {
-    background-color: #fefefe;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.ticket-card:hover {
-    background-color: #e9ecef;
-    border-color: #c0c0c0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.ticket-card h4 {
+.summary-card h3 {
     margin-top: 0;
-    margin-bottom: 8px;
+    color: #555;
     font-size: 1.1em;
-    color: #343a40;
 }
 
-.ticket-card p {
-    margin: 0 0 5px 0;
-    font-size: 0.9em;
-    color: #6c757d;
+.summary-card p.count {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #007bff;
+    margin: 10px 0 0;
 }
 
-.ticket-card .ticket-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85em;
-    color: #888;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #f0f0f0;
+.filters-section {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 30px;
 }
 
-.ticket-card .ticket-info span {
+.filters-section h3 {
+    margin-top: 0;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.filters-grid .form-group {
+    margin-bottom: 0; /* Remove margin-bottom padrão do form-group */
+}
+
+.filters-grid label {
     display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #666;
 }
 
-/* Responsividade */
-@media (max-width: 1200px) {
-    .ticket-boards-container {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajusta para telas menores */
-    }
+.filters-grid select,
+.filters-grid input[type="date"],
+.filters-grid input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Garante que padding não aumente a largura */
 }
 
-@media (max-width: 768px) {
-    .ticket-boards-container {
-        grid-template-columns: 1fr; /* Uma coluna em telas muito pequenas */
-    }
+.filters-actions {
+    margin-top: 20px;
+    text-align: right;
 }
+
+.filters-actions .btn {
+    margin-left: 10px;
+}
+
+.tickets-list-section {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.tickets-list-section h3 {
+    margin-top: 0;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para a tabela de tickets */
+.tickets-list-section .data-grid {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tickets-list-section .data-grid th,
+.tickets-list-section .data-grid td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.tickets-list-section .data-grid th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #333;
+}
+
+.tickets-list-section .data-grid tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tickets-list-section .data-grid tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.tickets-list-section .data-grid .btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+/* Status colors */
+.status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #fff;
+    font-size: 0.9em;
+    display: inline-block;
+}
+.status.Pendente { background-color: #ffc107; color: #333; } /* Amarelo */
+.status.Em-Andamento { background-color: #007bff; } /* Azul */
+.status.Aguardando-Peca { background-color: #6c757d; } /* Cinza */
+.status.Aguardando-Aprovacao { background-color: #fd7e14; } /* Laranja */
+.status.Finalizada { background-color: #28a745; } /* Verde */
+.status.Faturada { background-color: #6610f2; } /* Roxo */
+.status.Cancelado { background-color: #dc3545; } /* Vermelho */

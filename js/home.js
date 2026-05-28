@@ -1,178 +1,138 @@
-// js/home.js - Versão Corrigida com Painel de Tickets como item de menu separado
+// js/home.js - Versão Completa e Atualizada para as Novas Páginas
 
-// Funções auxiliares para criar elementos HTML (para evitar repetição)
-function createDashboardSummary() {
-    const div = document.createElement('div');
-    div.classList.add('dashboard-summary');
-    div.innerHTML = `
-        <div class="summary-card"><h3>Tickets Abertos</h3><p class="count">5</p></div>
-        <div class="summary-card"><h3>Tickets em Andamento</h3><p class="count">12</p></div>
-        <div class="summary-card"><h3>Tickets Concluídos (Hoje)</h3><p class="count">3</p></div>
-    `;
-    return div;
-}
+document.addEventListener('DOMContentLoaded', initializePage);
 
-function createRecentTickets() {
-    const section = document.createElement('section');
-    section.classList.add('recent-tickets');
-    section.innerHTML = `
-        <h2>Tickets Recentes</h2>
-        <ul>
-            <li>#001 - Problema com acesso à rede - <span class="status pending">Pendente</span></li>
-            <li>#002 - Solicitação de instalação de software - <span class="status in-progress">Em Andamento</span></li>
-            <li>#003 - Lentidão no sistema - <span class="status resolved">Resolvido</span></li>
-        </ul>
-    `;
-    return section;
-}
-
-// Função para carregar conteúdo HTML e JavaScript dinamicamente
-async function loadContent(pageUrl, scriptUrl = null, pageTitleText = '') {
+// Função para carregar conteúdo dinamicamente na área principal
+const loadContent = (page, script = null, title = '') => {
     const mainContentArea = document.getElementById('mainContentArea');
     const pageTitleElement = document.getElementById('pageTitle');
     const topbarElement = document.querySelector('.topbar');
 
-    mainContentArea.innerHTML = ''; // Limpa o conteúdo atual
+    // Limpa o conteúdo atual
+    mainContentArea.innerHTML = '';
 
-    // Lógica para esconder/mostrar a topbar e o título
-    // Esconde se for 'Dashboard', 'Gerenciar Usuários', 'Gerenciar Técnicos', 'Gerenciar Produtos', 'Gerenciar Clientes', 'Gerenciar Equipamentos', 'Abrir Ticket', 'Gerenciar Tickets', 'Meus Tickets' ou 'Painel de Tickets'
-    if (pageTitleText === 'Dashboard' || pageTitleText === 'Gerenciar Usuários' || pageTitleText === 'Gerenciar Técnicos' || pageTitleText === 'Gerenciar Produtos' || pageTitleText === 'Gerenciar Clientes' || pageTitleText === 'Gerenciar Equipamentos' || pageTitleText === 'Abrir Ticket' || pageTitleText === 'Gerenciar Tickets' || pageTitleText === 'Meus Tickets' || pageTitleText === 'Painel de Tickets') {
-        if (topbarElement) topbarElement.style.display = 'none';
-    } else { // Para outras páginas, mostra a topbar e define o título
-        if (topbarElement) topbarElement.style.display = 'flex';
-        if (pageTitleElement) pageTitleElement.textContent = pageTitleText;
+    // Remove qualquer script JS carregado anteriormente para evitar duplicação de event listeners
+    const oldScript = document.getElementById('dynamicScript');
+    if (oldScript) {
+        oldScript.remove();
     }
 
-    // Carrega o HTML
-    try {
-        const response = await fetch(pageUrl);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const html = await response.text();
-        mainContentArea.innerHTML = html;
-
-        // Carrega o JavaScript associado, se houver
-        if (scriptUrl) {
-            // Remove scripts anteriores para evitar duplicação e erros
-            const oldScript = document.getElementById('dynamicScript');
-            if (oldScript) oldScript.remove();
-
-            const script = document.createElement('script');
-            script.src = scriptUrl;
-            script.id = 'dynamicScript'; // Adiciona um ID para fácil remoção
-            script.onload = () => {
-                console.log(`Script ${scriptUrl} carregado com sucesso.`);
-            };
-            script.onerror = () => console.error(`Erro ao carregar script: ${scriptUrl}`);
-            document.body.appendChild(script);
+    // Define o título da página e visibilidade da topbar
+    if (pageTitleElement) {
+        pageTitleElement.textContent = title;
+    }
+    if (topbarElement) {
+        // Ocultar topbar para certas páginas se desejar um layout diferente
+        if (['Gerenciar Usuários', 'Gerenciar Técnicos', 'Gerenciar Produtos', 'Gerenciar Clientes', 'Gerenciar Equipamentos', 'Abrir Ticket', 'Gerenciar Tickets', 'Meus Tickets', 'Painel de Tickets', 'Editar Ticket'].includes(title)) { // Adicionado 'Editar Ticket'
+            topbarElement.style.display = 'none';
+        } else {
+            topbarElement.style.display = 'flex';
         }
-    } catch (error) {
-        console.error('Erro ao carregar conteúdo:', error);
-        mainContentArea.innerHTML = `<p class="error-message">Erro ao carregar a página.</p>`;
     }
-}
 
+    // Carrega o HTML da página
+    fetch(page)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            mainContentArea.innerHTML = html;
 
-// Função principal para construir o menu lateral e o conteúdo da HOME
+            // Carrega o script JS associado, se houver
+            if (script) {
+                const scriptElement = document.createElement('script');
+                scriptElement.id = 'dynamicScript';
+                scriptElement.src = script;
+                scriptElement.onload = () => {
+                    console.log(`Script ${script} carregado com sucesso.`);
+                };
+                scriptElement.onerror = () => {
+                    console.error(`Erro ao carregar o script ${script}.`);
+                };
+                document.body.appendChild(scriptElement);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar o conteúdo da página:', error);
+            mainContentArea.innerHTML = `<p>Erro ao carregar a página: ${title}.</p>`;
+        });
+};
+
 function initializePage() {
-    const userProfile = localStorage.getItem('userProfile');
     const loggedInUser = localStorage.getItem('loggedInUser');
+    const userProfile = localStorage.getItem('userProfile');
+    const loggedInUserDisplay = document.getElementById('loggedInUserDisplay');
+    const sidebarNavList = document.getElementById('sidebarNavList');
 
-    // Se não houver perfil ou usuário logado, redireciona para o login (segurança básica)
-    if (!userProfile || !loggedInUser) {
+    if (!loggedInUser || !userProfile) {
         window.location.href = 'login.html';
         return;
     }
 
-    // Atualiza o nome do usuário no rodapé do sidebar
-    const loggedInUserDisplay = document.getElementById('loggedInUserDisplay');
     if (loggedInUserDisplay) {
-        loggedInUserDisplay.textContent = loggedInUser;
+        loggedInUserDisplay.textContent = `${loggedInUser} (${userProfile})`;
     }
 
-    const sidebarNavList = document.getElementById('sidebarNavList');
-    const mainContentArea = document.getElementById('mainContentArea');
-    const pageTitleElement = document.getElementById('pageTitle'); // Pega o elemento do título
-    const topbarElement = document.querySelector('.topbar'); // Pega o elemento da topbar
-
-    // Limpa apenas a navegação para reconstruir conforme o perfil
+    // Limpa o menu existente
     sidebarNavList.innerHTML = '';
 
-    // Função para adicionar um item de menu
-    const addMenuItem = (text, targetPage, scriptToLoad = null, isActive = false, id = '') => {
+    // Função auxiliar para adicionar itens ao menu
+    const addMenuItem = (text, targetPage, scriptToLoad = null, isDashboard = false, id = null) => {
         const li = document.createElement('li');
         const a = document.createElement('a');
-        a.href = '#'; // Todos os links agora são '#' para evitar recarregar a página
+        a.href = '#';
         a.textContent = text;
-        if (isActive) a.classList.add('active');
         if (id) a.id = id;
 
         a.addEventListener('click', (event) => {
             event.preventDefault();
-            // Remove a classe 'active' de todos os itens e adiciona ao clicado
-            document.querySelectorAll('.sidebar-nav a').forEach(item => item.classList.remove('active'));
-            a.classList.add('active');
-
             if (id === 'logoutButton') {
-                const confirmLogout = confirm('Tem certeza que deseja sair?');
-                if (confirmLogout) {
-                    localStorage.removeItem('userProfile');
-                    localStorage.removeItem('loggedInUser');
-                    alert('Você foi desconectado.');
-                    window.location.href = 'login.html';
-                }
-            } else if (targetPage === 'dashboard') { // Conteúdo da dashboard da home
-                mainContentArea.innerHTML = ''; // Limpa antes de adicionar
+                localStorage.removeItem('loggedInUser');
+                localStorage.removeItem('userProfile');
+                window.location.href = 'login.html';
+                return;
+            }
 
-                // Esconde a topbar para a dashboard
-                if (topbarElement) topbarElement.style.display = 'none';
+            if (isDashboard) {
+                // Lógica específica para a dashboard
+                const mainContentArea = document.getElementById('mainContentArea');
+                const pageTitleElement = document.getElementById('pageTitle');
+                const topbarElement = document.querySelector('.topbar');
 
-                if (userProfile === 'user') {
-                    mainContentArea.innerHTML = `
-                        <h2>Meus Tickets</h2>
-                        <p>Aqui você pode ver o histórico dos seus tickets e o status atual.</p>
-                        <ul>
-                            <li>#004 - Problema com impressora - <span class="status pending">Pendente</span></li>
-                            <li>#005 - Solicitação de acesso VPN - <span class="status in-progress">Em Andamento</span></li>
-                        </ul>
-                        <button onclick="alert('Abrir formulário de novo ticket')">Abrir Novo Ticket</button>
+                if (pageTitleElement) pageTitleElement.textContent = text;
+                if (topbarElement) topbarElement.style.display = 'flex'; // Garante que a topbar apareça na dashboard
+
+                mainContentArea.innerHTML = ''; // Limpa o conteúdo atual
+                mainContentArea.appendChild(createDashboardSummary());
+                mainContentArea.appendChild(createRecentTickets());
+                if (userProfile === 'technician') {
+                    const techActions = document.createElement('div');
+                    techActions.innerHTML = `
+                        <h3>Ações do Técnico</h3>
+                        <button class="btn" onclick="loadContent('open_ticket.html', 'js/open_ticket.js', 'Abrir Ticket')">Abrir Novo Ticket</button>
+                        <button class="btn" onclick="loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Gerenciar Tickets')">Ver Meus Tickets</button>
+                        <button class="btn" onclick="loadContent('ticket_dashboard.html', 'js/ticket_dashboard.js', 'Painel de Tickets')">Ver Painel de Tickets</button>
                     `;
-                } else { // Technician e Admin
-                    mainContentArea.innerHTML = `
-                        <h2>Dashboard do ${userProfile === 'technician' ? 'Técnico' : 'Administrador'}</h2>
-                        <p>Visão geral dos tickets e ações rápidas.</p>
+                    mainContentArea.appendChild(techActions);
+                } else if (userProfile === 'admin') {
+                    const adminActions = document.createElement('div');
+                    adminActions.innerHTML = `
+                        <h3>Ações do Administrador</h3>
+                        <button class="btn" onclick="loadContent('open_ticket.html', 'js/open_ticket.js', 'Abrir Ticket')">Abrir Novo Ticket</button>
+                        <button class="btn" onclick="loadContent('manage_tickets.html', 'js/manage_tickets.js', 'Gerenciar Tickets')">Gerenciar Todos os Tickets</button>
+                        <button class="btn" onclick="loadContent('ticket_dashboard.html', 'js/ticket_dashboard.js', 'Painel de Tickets')">Ver Painel de Tickets</button>
+                        <button class="btn" onclick="loadContent('register_user.html', 'js/register_user.js', 'Gerenciar Usuários')">Gerenciar Usuários</button>
+                        <button class="btn" onclick="loadContent('register_technician.html', 'js/register_technician.js', 'Gerenciar Técnicos')">Gerenciar Técnicos</button>
+                        <button class="btn" onclick="loadContent('register_client.html', 'js/register_client.js', 'Gerenciar Clientes')">Gerenciar Clientes</button>
+                        <button class="btn" onclick="loadContent('register_product.html', 'js/register_product.js', 'Gerenciar Produtos')">Gerenciar Produtos</button>
+                        <button class="btn" onclick="loadContent('register_equipment.html', 'js/register_equipment.js', 'Gerenciar Equipamentos')">Gerenciar Equipamentos</button>
                     `;
-                    mainContentArea.appendChild(createDashboardSummary());
-                    mainContentArea.appendChild(createRecentTickets());
-                    if (userProfile === 'technician') {
-                        const techActions = document.createElement('div');
-                        techActions.innerHTML = `
-                            <h3>Ações do Técnico</h3>
-                            <button onclick="alert('Ver todos os tickets')">Gerenciar Tickets</button>
-                            <button onclick="alert('Atualizar status')">Atualizar Status</button>
-                        `;
-                        mainContentArea.appendChild(techActions);
-                    } else if (userProfile === 'admin') {
-                        const adminActions = document.createElement('div');
-                        adminActions.innerHTML = `
-                            <h3>Ações do Administrador</h3>
-                            <button onclick="alert('Gerenciar Usuários')">Gerenciar Usuários</button>
-                            <button onclick="alert('Gerenciar Técnicos')">Gerenciar Técnicos</button>
-                            <button onclick="alert('Gerenciar Clientes')">Gerenciar Clientes</button>
-                            <button onclick="alert('Gerenciar Produtos')">Gerenciar Produtos</button>
-                            <button onclick="alert('Gerenciar Equipamentos')">Gerenciar Equipamentos</button>
-                        `;
-                        mainContentArea.appendChild(adminActions);
-                    }
+                    mainContentArea.appendChild(adminActions);
                 }
             } else { // Carrega o conteúdo de outras páginas
-                // Mostra a topbar e define o título para outras páginas, a menos que seja uma das páginas sem título
-                if (topbarElement) {
-                    if (text === 'Gerenciar Usuários' || text === 'Gerenciar Técnicos' || text === 'Gerenciar Produtos' || text === 'Gerenciar Clientes' || text === 'Gerenciar Equipamentos' || text === 'Abrir Ticket' || text === 'Gerenciar Tickets' || text === 'Meus Tickets' || text === 'Painel de Tickets') {
-                        topbarElement.style.display = 'none';
-                    } else {
-                        topbarElement.style.display = 'flex';
-                    }
-                }
                 loadContent(targetPage, scriptToLoad, text); // Passa o texto do menu como título da página
             }
         });
@@ -187,28 +147,24 @@ function initializePage() {
         case 'user':
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
             addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js'); // Cliente pode abrir ticket
-            addMenuItem('Meus Tickets', 'user_tickets.html', 'js/user_tickets.js'); // Exemplo futuro
+            addMenuItem('Meus Tickets', 'manage_tickets.html', 'js/manage_tickets.js'); // Cliente vê seus tickets
             addMenuItem('Sair', '', null, false, 'logoutButton');
             break;
 
         case 'technician':
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
-            // CORREÇÃO AQUI: "Gerenciar Tickets" volta a apontar para o formulário de CRUD
-            addMenuItem('Gerenciar Tickets', 'open_ticket.html', 'js/open_ticket.js');
-            // NOVO ITEM: "Painel de Tickets" aponta para o dashboard visual
+            addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js');
+            addMenuItem('Meus Tickets', 'manage_tickets.html', 'js/manage_tickets.js'); // Técnico vê seus tickets
             addMenuItem('Painel de Tickets', 'ticket_dashboard.html', 'js/ticket_dashboard.js');
-            // "Abrir Ticket" continua oculto para técnico
             addMenuItem('Configurações', 'tech_settings.html', 'js/tech_settings.js');
             addMenuItem('Sair', '', null, false, 'logoutButton');
             break;
 
         case 'admin':
             dashboardLink = addMenuItem('Dashboard', 'dashboard', null, true);
-            // CORREÇÃO AQUI: "Gerenciar Tickets" volta a apontar para o formulário de CRUD
-            addMenuItem('Gerenciar Tickets', 'open_ticket.html', 'js/open_ticket.js');
-            // NOVO ITEM: "Painel de Tickets" aponta para o dashboard visual
+            addMenuItem('Abrir Ticket', 'open_ticket.html', 'js/open_ticket.js');
+            addMenuItem('Gerenciar Tickets', 'manage_tickets.html', 'js/manage_tickets.js'); // Admin gerencia todos os tickets
             addMenuItem('Painel de Tickets', 'ticket_dashboard.html', 'js/ticket_dashboard.js');
-            // "Abrir Ticket" continua oculto para admin
             addMenuItem('Gerenciar Usuários', 'register_user.html', 'js/register_user.js');
             addMenuItem('Gerenciar Técnicos', 'register_technician.html', 'js/register_technician.js');
             addMenuItem('Gerenciar Clientes', 'register_client.html', 'js/register_client.js');
@@ -223,11 +179,31 @@ function initializePage() {
             break;
     }
 
+    // Funções auxiliares para a dashboard (seção de resumo e tickets recentes)
+    function createDashboardSummary() {
+        const summaryDiv = document.createElement('div');
+        summaryDiv.className = 'dashboard-summary';
+        summaryDiv.innerHTML = `
+            <h3>Resumo da Dashboard</h3>
+            <p>Bem-vindo, ${loggedInUser}! Seu perfil é: ${userProfile}.</p>
+            <!-- Adicione mais informações de resumo aqui se desejar -->
+        `;
+        return summaryDiv;
+    }
+
+    function createRecentTickets() {
+        const recentTicketsDiv = document.createElement('div');
+        recentTicketsDiv.className = 'recent-tickets';
+        recentTicketsDiv.innerHTML = `
+            <h3>Tickets Recentes</h3>
+            <p>Esta seção pode mostrar os últimos tickets abertos ou atualizados.</p>
+            <!-- Tabela ou lista de tickets recentes pode ser adicionada aqui -->
+        `;
+        return recentTicketsDiv;
+    }
+
     // Carrega o conteúdo inicial da dashboard (simula o clique no link da dashboard)
     if (dashboardLink) {
         dashboardLink.click();
     }
 }
-
-// Inicializa a página quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', initializePage);
