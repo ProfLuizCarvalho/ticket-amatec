@@ -1,142 +1,230 @@
-<!-- open_ticket.html (FRAGMENTO HTML) -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abertura de Ticket</title>
+    <!-- Inclua seus arquivos CSS aqui, se necessário -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <!-- Adicione outros CSS que você possa ter, como para a grid de dados -->
+</head>
+<body>
+    <!-- Este conteúdo é um fragmento que será carregado dinamicamente no mainContentArea -->
+    <div class="main-content">
+        <div class="form-section">
+            <form id="ticketForm" class="form-container">
+                <div class="form-header">
+                    <h2>Abertura de Ticket</h2>
+                </div>
 
-<div class="main-content">
-    <div class="form-section">
-        <form id="ticketForm" class="form-container">
-            <div class="form-header">
-                <h2>Abertura de Ticket</h2>
-            </div>
+                <!-- Seção: Informações do Ticket -->
+                <div class="form-subsection-header">
+                    <h3>Informações do Ticket</h3>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="ticketId">ID do Ticket:</label>
+                        <input type="text" id="ticketId" name="ticketId" required readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="openingDate">Data de Abertura:</label>
+                        <input type="date" id="openingDate" name="openingDate" required readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientId">Cliente:</label>
+                        <select id="clientId" name="clientId" required>
+                            <option value="">Selecione um Cliente</option>
+                            <!-- Clientes serão carregados via JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentId">Equipamento:</label>
+                        <select id="equipmentId" name="equipmentId" required>
+                            <option value="">Selecione um Equipamento</option>
+                            <!-- Equipamentos do cliente selecionado serão carregados via JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sector">Setor:</label>
+                        <input type="text" id="sector" name="sector" readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="terminal">Terminal:</label>
+                        <input type="text" id="terminal" name="terminal" readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentNumber">Número do Equipamento:</label>
+                        <input type="text" id="equipmentNumber" name="equipmentNumber" readonly disabled>
+                    </div>
+                    <div class="form-group form-group-full-width">
+                        <label for="problemDescription">Problema Relatado:</label>
+                        <textarea id="problemDescription" name="problemDescription" rows="3" required></textarea>
+                    </div>
+                </div>
 
-            <!-- Seção: Dados do Ticket (Preenchido na Abertura) -->
-            <div class="form-subsection-header">
-                <h3>Informações do Ticket</h3>
-            </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="ticketId">ID do Ticket:</label>
-                    <input type="text" id="ticketId" name="ticketId" required readonly disabled>
+                <!-- Seção: Informações do Atendimento (Técnico) -->
+                <div class="form-subsection-header">
+                    <h3>Informações do Atendimento (Técnico)</h3>
                 </div>
-                <div class="form-group">
-                    <label for="openingDate">Data de Abertura:</label>
-                    <input type="date" id="openingDate" name="openingDate" required readonly disabled>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="technicianId">Técnico Responsável:</label>
+                        <select id="technicianId" name="technicianId" disabled>
+                            <option value="">Selecione um Técnico</option>
+                            <!-- Técnicos serão carregados via JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="scheduledDate">Data de Agendamento:</label>
+                        <input type="date" id="scheduledDate" name="scheduledDate" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceDate">Data de Atendimento:</label>
+                        <input type="date" id="serviceDate" name="serviceDate" disabled>
+                    </div>
+                    <div class="form-group form-group-full-width">
+                        <label for="diagnosis">Diagnóstico:</label>
+                        <textarea id="diagnosis" name="diagnosis" rows="3" disabled></textarea>
+                    </div>
+                    <div class="form-group form-group-full-width">
+                        <label for="solution">Solução:</label>
+                        <textarea id="solution" name="solution" rows="3" disabled></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="hasWarrantyTicket">Garantia (Ticket):</label>
+                        <select id="hasWarrantyTicket" name="hasWarrantyTicket" disabled>
+                            <option value="">Selecione</option>
+                            <option value="Sim">Sim</option>
+                            <option value="Nao">Não</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="warrantyEndDateTicketGroup">
+                        <label for="warrantyEndDateTicket">Data Fim da Garantia (Ticket):</label>
+                        <input type="date" id="warrantyEndDateTicket" name="warrantyEndDateTicket" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="billingDueDate">Data de Vencimento para Faturamento:</label>
+                        <input type="date" id="billingDueDate" name="billingDueDate" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select id="status" name="status" required>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em Andamento">Em Andamento</option>
+                            <option value="Aguardando Peça">Aguardando Peça</option>
+                            <option value="Aguardando Aprovação">Aguardando Aprovação</option>
+                            <option value="Finalizada">Finalizada</option>
+                            <option value="Faturada">Faturada</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="clientId">Cliente:</label>
-                    <select id="clientId" name="clientId" required>
-                        <option value="">Selecione um Cliente</option>
-                        <!-- Clientes serão carregados via JS -->
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="equipmentId">Equipamento:</label>
-                    <select id="equipmentId" name="equipmentId" required>
-                        <option value="">Selecione um Equipamento</option>
-                        <!-- Equipamentos do cliente selecionado serão carregados via JS -->
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="sector">Setor:</label>
-                    <input type="text" id="sector" name="sector" readonly disabled>
-                </div>
-                <div class="form-group">
-                    <label for="terminal">Terminal:</label>
-                    <input type="text" id="terminal" name="terminal" readonly disabled>
-                </div>
-                <div class="form-group">
-                    <label for="equipmentNumber">Número do Equipamento:</label>
-                    <input type="text" id="equipmentNumber" name="equipmentNumber" readonly disabled>
-                </div>
-                <div class="form-group form-group-full-width">
-                    <label for="problemDescription">Problema Relatado:</label>
-                    <textarea id="problemDescription" name="problemDescription" rows="3" required></textarea>
-                </div>
-            </div>
 
-            <!-- Seção: Dados do Atendimento (Preenchido pelo Técnico) -->
-            <div class="form-subsection-header">
-                <h3>Informações do Atendimento (Técnico)</h3>
-            </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="technicianId">Técnico Responsável:</label>
-                    <select id="technicianId" name="technicianId" disabled>
-                        <option value="">Selecione um Técnico</option>
-                        <!-- Técnicos serão carregados via JS -->
-                    </select>
+                <!-- Seção: Produtos Vendidos -->
+                <div class="form-subsection-header">
+                    <h3>Produtos Vendidos</h3>
                 </div>
-                <div class="form-group">
-                    <label for="scheduledDate">Data de Agendamento:</label>
-                    <input type="date" id="scheduledDate" name="scheduledDate" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="serviceDate">Data de Atendimento:</label>
-                    <input type="date" id="serviceDate" name="serviceDate" disabled>
-                </div>
-                <div class="form-group form-group-full-width">
-                    <label for="diagnosis">Diagnóstico:</label>
-                    <textarea id="diagnosis" name="diagnosis" rows="3" disabled></textarea>
-                </div>
-                <div class="form-group form-group-full-width">
-                    <label for="solution">Solução:</label>
-                    <textarea id="solution" name="solution" rows="3" disabled></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="hasWarrantyTicket">Garantia (Ticket):</label>
-                    <select id="hasWarrantyTicket" name="hasWarrantyTicket" disabled>
-                        <option value="">Selecione</option>
-                        <option value="Sim">Sim</option>
-                        <option value="Nao">Não</option>
-                    </select>
-                </div>
-                <div class="form-group" id="warrantyEndDateTicketGroup">
-                    <label for="warrantyEndDateTicket">Data Fim da Garantia (Ticket):</label>
-                    <input type="date" id="warrantyEndDateTicket" name="warrantyEndDateTicket" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="billingDueDate">Data de Vencimento para Faturamento:</label>
-                    <input type="date" id="billingDueDate" name="billingDueDate" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="status">Status:</label>
-                    <select id="status" name="status" required>
-                        <option value="Pendente">Pendente</option>
-                        <option value="Em Andamento">Em Andamento</option>
-                        <option value="Aguardando Peça">Aguardando Peça</option>
-                        <option value="Aguardando Aprovação">Aguardando Aprovação</option>
-                        <option value="Finalizada">Finalizada</option>
-                        <option value="Faturada">Faturada</option>
-                    </select>
-                </div>
-            </div>
+                <div class="form-grid" id="productsSoldSection">
+                    <div class="form-group">
+                        <label for="productId">Produto:</label>
+                        <select id="productId" name="productId" disabled>
+                            <option value="">Selecione um Produto</option>
+                            <!-- Produtos serão carregados via JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productQuantity">Quantidade:</label>
+                        <input type="number" id="productQuantity" name="productQuantity" min="1" value="1" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="productUnitPrice">Preço Unitário (Original):</label>
+                        <input type="text" id="productUnitPrice" name="productUnitPrice" readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="productDiscount">Desconto (%):</label>
+                        <input type="number" id="productDiscount" name="productDiscount" min="0" max="100" value="0" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="productUnitPriceWithDiscount">Preço Unitário (c/ Desc.):</label>
+                        <input type="text" id="productUnitPriceWithDiscount" name="productUnitPriceWithDiscount" readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="productTotalPrice">Total do Item (c/ Desc.):</label>
+                        <input type="text" id="productTotalPrice" name="productTotalPrice" readonly disabled>
+                    </div>
+                    <div class="form-group form-group-full-width">
+                        <button type="button" id="addProductBtn" class="btn btn-secondary" disabled>Adicionar Produto</button>
+                    </div>
 
-            <div class="form-actions">
-                <button type="button" id="editButton" class="btn btn-primary">Editar</button>
-                <button type="button" id="deleteButton" class="btn btn-danger">Excluir</button>
-                <button type="button" id="cancelButton" class="btn btn-secondary">Cancelar</button>
-                <button type="submit" id="saveButton" class="btn btn-success">Salvar</button>
-            </div>
-            <p id="formMessage" class="error-message"></p>
-        </form>
+                    <div class="form-group form-group-full-width">
+                        <h4>Itens do Ticket:</h4>
+                        <table class="data-grid" id="productsTable">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Qtd</th>
+                                    <th>Preço Unit. (Original)</th>
+                                    <th>Desconto (%)</th>
+                                    <th>Preço Unit. (c/ Desc.)</th>
+                                    <th>Subtotal (c/ Desc.)</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Produtos adicionados serão injetados aqui -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5" style="text-align: right;"><strong>Subtotal (s/ Desconto):</strong></td>
+                                    <td id="productsSubtotalOriginal">R$ 0.00</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" style="text-align: right;"><strong>Total de Desconto:</strong></td>
+                                    <td id="productsTotalDiscount">R$ 0.00</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" style="text-align: right;"><strong>Subtotal (c/ Desconto):</strong></td>
+                                    <td id="productsSubtotalWithDiscount">R$ 0.00</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="editButton" class="btn btn-primary">Editar</button>
+                    <button type="button" id="deleteButton" class="btn btn-danger">Excluir</button>
+                    <button type="button" id="cancelButton" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="saveButton" class="btn btn-success">Salvar</button>
+                </div>
+                <p id="formMessage" class="error-message"></p>
+            </form>
+        </div>
+
+        <div class="grid-section">
+            <h2>Tickets Abertos</h2>
+            <table id="ticketGrid" class="data-grid">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Abertura</th>
+                        <th>Cliente</th>
+                        <th>Equipamento</th>
+                        <th>Problema</th>
+                        <th>Técnico</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Linhas de tickets serão injetadas aqui pelo JS -->
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <div class="grid-section">
-        <h2>Tickets Abertos</h2>
-        <table id="ticketGrid" class="data-grid">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Abertura</th>
-                    <th>Cliente</th>
-                    <th>Equipamento</th>
-                    <th>Problema</th>
-                    <th>Técnico</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Linhas de tickets serão injetadas aqui pelo JS -->
-            </tbody>
-        </table>
-    </div>
-</div>
+    <!-- O script JS será carregado dinamicamente pelo home.js -->
+</body>
+</html>

@@ -1,4 +1,4 @@
-// js/open_ticket.js - Versão Atualizada para Edição a partir do Painel
+// js/open_ticket.js - Versão Completa com Seção de Produtos Vendidos e Cálculos de Desconto
 
 document.addEventListener('DOMContentLoaded', () => {
     const ticketForm = document.getElementById('ticketForm');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelButton = document.getElementById('cancelButton');
     const deleteButton = document.getElementById('deleteButton');
 
-    // Referências aos campos do formulário
+    // Referências aos campos do formulário (Dados do Ticket)
     const ticketIdInput = document.getElementById('ticketId');
     const openingDateInput = document.getElementById('openingDate');
     const clientIdSelect = document.getElementById('clientId');
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const equipmentNumberInput = document.getElementById('equipmentNumber');
     const problemDescriptionTextarea = document.getElementById('problemDescription');
 
+    // Referências aos campos do formulário (Dados do Atendimento - Técnico)
     const technicianIdSelect = document.getElementById('technicianId');
     const scheduledDateInput = document.getElementById('scheduledDate');
     const serviceDateInput = document.getElementById('serviceDate');
@@ -31,10 +32,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const billingDueDateInput = document.getElementById('billingDueDate');
     const statusSelect = document.getElementById('status');
 
+    // Referências aos campos do formulário (Produtos Vendidos)
+    const productsSoldSection = document.getElementById('productsSoldSection'); // A seção inteira
+    const productIdSelect = document.getElementById('productId');
+    const productQuantityInput = document.getElementById('productQuantity');
+    const productUnitPriceInput = document.getElementById('productUnitPrice'); // Preço Unitário Original
+    const productDiscountInput = document.getElementById('productDiscount'); // NOVO: Desconto (%)
+    const productUnitPriceWithDiscountInput = document.getElementById('productUnitPriceWithDiscount'); // NOVO: Preço Unitário com Desconto
+    const productTotalPriceInput = document.getElementById('productTotalPrice'); // Total do Item com Desconto
+    const addProductBtn = document.getElementById('addProductBtn');
+    const productsTableBody = document.querySelector('#productsTable tbody');
+    const productsSubtotalOriginalDisplay = document.getElementById('productsSubtotalOriginal'); // NOVO: Subtotal Original
+    const productsTotalDiscountDisplay = document.getElementById('productsTotalDiscount'); // NOVO: Total de Desconto
+    const productsSubtotalWithDiscountDisplay = document.getElementById('productsSubtotalWithDiscount'); // NOVO: Subtotal com Desconto
+
     let editingTicketId = null;
     let allClients = {};
     let allEquipments = {};
     let allTechnicians = {};
+    let allProducts = {}; 
+    let currentTicketProducts = []; 
 
     const loggedInUserProfile = localStorage.getItem('userProfile'); // Perfil do usuário logado
 
@@ -44,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadClients = () => JSON.parse(localStorage.getItem('appClients')) || {};
     const loadEquipments = () => JSON.parse(localStorage.getItem('appEquipments')) || {};
     const loadTechnicians = () => JSON.parse(localStorage.getItem('appTechnicians')) || {};
+    const loadProducts = () => JSON.parse(localStorage.getItem('appProducts')) || {}; 
 
     // --- Lógica de UI e Interdependências ---
 
@@ -75,6 +93,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Popula o select de produtos
+    const populateProductSelect = () => {
+        allProducts = loadProducts();
+        productIdSelect.innerHTML = '<option value="">Selecione um Produto</option>';
+        const productArray = Object.keys(allProducts).map(id => ({ id, ...allProducts[id] }));
+        productArray.sort((a, b) => a.productName.localeCompare(b.productName));
+        productArray.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.productName;
+            productIdSelect.appendChild(option);
+        });
+    };
+
     // Popula o select de equipamentos com base no cliente selecionado
     const populateEquipmentSelect = () => {
         allEquipments = loadEquipments();
@@ -100,12 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateEquipmentDetails = () => {
         const selectedEquipmentId = equipmentIdSelect.value;
         if (selectedEquipmentId && allEquipments[selectedEquipmentId]) {
-            const eq = allEquipments[selectedEquipmentId];
-            // Estes campos 'sector' e 'terminal' precisam ser adicionados ao cadastro de equipamento
-            // Se não existirem, ficarão vazios ou com um valor padrão
-            sectorInput.value = eq.sector || ''; 
-            terminalInput.value = eq.terminal || ''; 
-            equipmentNumberInput.value = eq.patrimonyNumber || eq.id; // Usar patrimônio ou ID
+            const equipment = allEquipments[selectedEquipmentId];
+            sectorInput.value = equipment.sector || '';
+            terminalInput.value = equipment.terminal || '';
+            equipmentNumberInput.value = equipment.equipmentNumber || '';
         } else {
             sectorInput.value = '';
             terminalInput.value = '';
@@ -113,183 +143,264 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Alterna a visibilidade do campo de Data Fim da Garantia do Ticket
+    // Habilita/desabilita o campo de data fim da garantia do ticket
     const toggleWarrantyEndDateTicketField = () => {
         if (hasWarrantyTicketSelect.value === 'Sim') {
+            warrantyEndDateTicketInput.disabled = false;
             warrantyEndDateTicketGroup.style.display = 'block';
-            warrantyEndDateTicketInput.setAttribute('required', 'required');
         } else {
-            warrantyEndDateTicketGroup.style.display = 'none';
-            warrantyEndDateTicketInput.removeAttribute('required');
+            warrantyEndDateTicketInput.disabled = true;
             warrantyEndDateTicketInput.value = '';
+            warrantyEndDateTicketGroup.style.display = 'none';
         }
     };
 
-    // Controla a habilitação/desabilitação dos campos do técnico
-    const toggleTechnicianFields = (enable) => {
-        const technicianFields = [
-            technicianIdSelect, scheduledDateInput, serviceDateInput,
-            diagnosisTextarea, solutionTextarea, hasWarrantyTicketSelect,
-            warrantyEndDateTicketInput, billingDueDateInput
-        ];
-        technicianFields.forEach(field => {
-            if (field.id !== 'warrantyEndDateTicket') { // A data de garantia é controlada por toggleWarrantyEndDateTicketField
-                field.disabled = !enable;
-            }
-        });
-        // O status pode ser alterado por todos, mas o técnico tem mais opções
-        // statusSelect.disabled = !enable; // Decidir se o status é editável apenas pelo técnico
+    // Calcula e atualiza os campos de preço e total do item
+    const updateProductPriceFields = () => {
+        const selectedProductId = productIdSelect.value;
+        const quantity = parseFloat(productQuantityInput.value) || 0;
+        const discount = parseFloat(productDiscountInput.value) || 0; // Desconto em %
+
+        if (selectedProductId && allProducts[selectedProductId]) {
+            const product = allProducts[selectedProductId];
+            const unitPriceOriginal = parseFloat(product.price) || 0;
+
+            // Calcula o preço unitário com desconto
+            const unitPriceWithDiscount = unitPriceOriginal * (1 - (discount / 100));
+            // Calcula o total do item com desconto
+            const itemTotalPrice = unitPriceWithDiscount * quantity;
+
+            productUnitPriceInput.value = unitPriceOriginal.toFixed(2);
+            productUnitPriceWithDiscountInput.value = unitPriceWithDiscount.toFixed(2);
+            productTotalPriceInput.value = itemTotalPrice.toFixed(2);
+        } else {
+            productUnitPriceInput.value = '0.00';
+            productUnitPriceWithDiscountInput.value = '0.00';
+            productTotalPriceInput.value = '0.00';
+        }
     };
 
-    // --- Funções de CRUD ---
+    // Adiciona um produto à lista de produtos do ticket
+    const addProductToTicket = () => {
+        const selectedProductId = productIdSelect.value;
+        const quantity = parseFloat(productQuantityInput.value);
+        const discount = parseFloat(productDiscountInput.value); // Desconto em %
 
-    // Função para renderizar a grid de tickets
-    const renderTicketGrid = () => {
-        const tickets = loadTickets();
-        ticketGridBody.innerHTML = '';
+        if (!selectedProductId || !quantity || quantity <= 0) {
+            alert('Por favor, selecione um produto e informe uma quantidade válida.');
+            return;
+        }
 
-        const ticketArray = Object.keys(tickets).map(id => ({ id, ...tickets[id] }));
-        ticketArray.sort((a, b) => new Date(b.openingDate) - new Date(a.openingDate)); // Ordena por data de abertura mais recente
+        const product = allProducts[selectedProductId];
+        const unitPriceOriginal = parseFloat(product.price);
+        const unitPriceWithDiscount = unitPriceOriginal * (1 - (discount / 100));
+        const itemTotalPrice = unitPriceWithDiscount * quantity;
 
-        ticketArray.forEach(ticket => {
-            const row = ticketGridBody.insertRow();
-            row.dataset.ticketId = ticket.id;
+        const newProductItem = {
+            productId: selectedProductId,
+            productName: product.productName,
+            quantity: quantity,
+            unitPriceOriginal: unitPriceOriginal,
+            discount: discount, // Armazena o percentual de desconto
+            unitPriceWithDiscount: unitPriceWithDiscount,
+            totalPrice: itemTotalPrice
+        };
 
-            const clientName = ticket.clientId && allClients[ticket.clientId] ? (allClients[ticket.clientId].clientName || allClients[ticket.clientId].tradeName) : 'N/A';
-            const equipmentName = ticket.equipmentId && allEquipments[ticket.equipmentId] ? allEquipments[ticket.equipmentId].equipmentName : 'N/A';
-            const technicianName = ticket.technicianId && allTechnicians[ticket.technicianId] ? allTechnicians[ticket.technicianId].fullName : 'Não Atribuído';
+        currentTicketProducts.push(newProductItem);
+        renderProductsTable();
 
-            row.insertCell().textContent = ticket.id;
-            row.insertCell().textContent = ticket.openingDate;
-            row.insertCell().textContent = clientName;
-            row.insertCell().textContent = equipmentName;
-            row.insertCell().textContent = ticket.problemDescription.substring(0, 50) + (ticket.problemDescription.length > 50 ? '...' : '');
-            row.insertCell().textContent = technicianName;
-            row.insertCell().textContent = ticket.status;
+        // Reseta os campos de adição de produto
+        productIdSelect.value = '';
+        productQuantityInput.value = '1';
+        productDiscountInput.value = '0';
+        updateProductPriceFields(); // Limpa os campos de preço
+    };
 
-            const actionsCell = row.insertCell();
-            actionsCell.classList.add('grid-actions');
+    // Remove um produto da lista de produtos do ticket
+    const removeProductFromTicket = (index) => {
+        currentTicketProducts.splice(index, 1);
+        renderProductsTable();
+    };
 
-            const editBtn = document.createElement('button');
-            editBtn.textContent = 'Editar';
-            editBtn.classList.add('btn-edit-grid');
-            editBtn.addEventListener('click', () => editTicket(ticket.id));
-            actionsCell.appendChild(editBtn);
+    // Renderiza a tabela de produtos vendidos
+    const renderProductsTable = () => {
+        productsTableBody.innerHTML = '';
+        let subtotalOriginal = 0;
+        let totalDiscountAmount = 0;
+        let subtotalWithDiscount = 0;
 
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Excluir';
-            deleteBtn.classList.add('btn-delete-grid');
-            deleteBtn.addEventListener('click', (event) => {
-                event.stopPropagation();
-                deleteTicket(ticket.id);
+        currentTicketProducts.forEach((item, index) => {
+            const row = productsTableBody.insertRow();
+            row.innerHTML = `
+                <td>${item.productName}</td>
+                <td>${item.quantity}</td>
+                <td>R$ ${item.unitPriceOriginal.toFixed(2)}</td>
+                <td>${item.discount.toFixed(0)}%</td>
+                <td>R$ ${item.unitPriceWithDiscount.toFixed(2)}</td>
+                <td>R$ ${item.totalPrice.toFixed(2)}</td>
+                <td><button type="button" class="btn btn-danger btn-sm remove-product-btn" data-index="${index}">Remover</button></td>
+            `;
+            subtotalOriginal += item.unitPriceOriginal * item.quantity;
+            totalDiscountAmount += (item.unitPriceOriginal * item.quantity) - item.totalPrice;
+            subtotalWithDiscount += item.totalPrice;
+        });
+
+        productsSubtotalOriginalDisplay.textContent = `R$ ${subtotalOriginal.toFixed(2)}`;
+        productsTotalDiscountDisplay.textContent = `R$ ${totalDiscountAmount.toFixed(2)}`;
+        productsSubtotalWithDiscountDisplay.textContent = `R$ ${subtotalWithDiscount.toFixed(2)}`;
+
+        // Adiciona event listeners para os botões de remover
+        productsTableBody.querySelectorAll('.remove-product-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const index = parseInt(event.target.dataset.index);
+                removeProductFromTicket(index);
             });
-            actionsCell.appendChild(deleteBtn);
         });
     };
 
-    // Função para preencher o formulário com dados de um ticket para edição
+    // Gera um ID de ticket único (ex: TICKET-AAAA-MM-DD-HHMMSS)
+    const generateTicketId = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        return `TICKET-${year}${month}${day}-${hours}${minutes}${seconds}`;
+    };
+
+    // Renderiza a grid de tickets
+    const renderTicketGrid = () => {
+        ticketGridBody.innerHTML = '';
+        const tickets = loadTickets();
+        const ticketArray = Object.values(tickets);
+
+        // Filtra tickets para o cliente logado, se for perfil 'user'
+        let filteredTickets = ticketArray;
+        if (loggedInUserProfile === 'user') {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const clients = loadClients();
+            const client = Object.values(clients).find(c => c.clientUser === loggedInUser);
+            if (client) {
+                filteredTickets = ticketArray.filter(ticket => ticket.clientId === client.id);
+            } else {
+                filteredTickets = []; // Se o usuário logado não for um cliente, não mostra tickets
+            }
+        }
+
+        filteredTickets.sort((a, b) => new Date(b.openingDate) - new Date(a.openingDate)); // Ordena por data de abertura
+
+        if (filteredTickets.length === 0) {
+            const row = ticketGridBody.insertRow();
+            row.innerHTML = `<td colspan="8">Nenhum ticket encontrado.</td>`;
+            return;
+        }
+
+        filteredTickets.forEach(ticket => {
+            const row = ticketGridBody.insertRow();
+            row.dataset.ticketId = ticket.id; // Adiciona o ID do ticket como data attribute
+            const client = allClients[ticket.clientId];
+            const equipment = allEquipments[ticket.equipmentId];
+            const technician = allTechnicians[ticket.technicianId];
+
+            row.innerHTML = `
+                <td>${ticket.id}</td>
+                <td>${ticket.openingDate}</td>
+                <td>${client ? (client.clientName || client.tradeName) : 'N/A'}</td>
+                <td>${equipment ? equipment.equipmentName : 'N/A'}</td>
+                <td>${ticket.problemDescription.substring(0, 50)}...</td>
+                <td>${technician ? technician.fullName : 'N/A'}</td>
+                <td>${ticket.status}</td>
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="editTicket('${ticket.id}')">Editar</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteTicket('${ticket.id}')">Excluir</button>
+                </td>
+            `;
+        });
+    };
+
+    // Preenche o formulário para edição de um ticket existente
     const editTicket = (id) => {
         const tickets = loadTickets();
-        const ticketToEdit = tickets[id];
+        const ticket = tickets[id];
 
-        if (ticketToEdit) {
-            ticketIdInput.value = ticketToEdit.id;
-            openingDateInput.value = ticketToEdit.openingDate;
-            clientIdSelect.value = ticketToEdit.clientId;
+        if (ticket) {
+            editingTicketId = id;
+
+            ticketIdInput.value = ticket.id;
+            openingDateInput.value = ticket.openingDate;
+            clientIdSelect.value = ticket.clientId;
             populateEquipmentSelect(); // Popula equipamentos para o cliente selecionado
-            equipmentIdSelect.value = ticketToEdit.equipmentId;
+            equipmentIdSelect.value = ticket.equipmentId;
             updateEquipmentDetails(); // Preenche detalhes do equipamento
-            problemDescriptionTextarea.value = ticketToEdit.problemDescription;
+            problemDescriptionTextarea.value = ticket.problemDescription;
 
-            technicianIdSelect.value = ticketToEdit.technicianId || '';
-            scheduledDateInput.value = ticketToEdit.scheduledDate || '';
-            serviceDateInput.value = ticketToEdit.serviceDate || '';
-            diagnosisTextarea.value = ticketToEdit.diagnosis || '';
-            solutionTextarea.value = ticketToEdit.solution || '';
-            hasWarrantyTicketSelect.value = ticketToEdit.hasWarrantyTicket || '';
-            warrantyEndDateTicketInput.value = ticketToEdit.warrantyEndDateTicket || '';
-            billingDueDateInput.value = ticketToEdit.billingDueDate || '';
-            statusSelect.value = ticketToEdit.status;
+            technicianIdSelect.value = ticket.technicianId || '';
+            scheduledDateInput.value = ticket.scheduledDate || '';
+            serviceDateInput.value = ticket.serviceDate || '';
+            diagnosisTextarea.value = ticket.diagnosis || '';
+            solutionTextarea.value = ticket.solution || '';
+            hasWarrantyTicketSelect.value = ticket.hasWarrantyTicket || 'Nao';
+            toggleWarrantyEndDateTicketField(); // Mostra/esconde campo de garantia
+            warrantyEndDateTicketInput.value = ticket.warrantyEndDateTicket || '';
+            billingDueDateInput.value = ticket.billingDueDate || '';
+            statusSelect.value = ticket.status;
 
-            ticketIdInput.disabled = true; // ID não editável
-            openingDateInput.disabled = true; // Data de abertura não editável
+            currentTicketProducts = ticket.productsSold || [];
+            renderProductsTable();
 
-            // Habilita/desabilita campos com base no perfil
-            if (loggedInUserProfile === 'admin' || loggedInUserProfile === 'technician') {
-                toggleTechnicianFields(true); // Técnico e Admin podem editar campos do técnico
-                clientIdSelect.disabled = false; // Admin pode mudar cliente
-                equipmentIdSelect.disabled = false; // Admin pode mudar equipamento
-                problemDescriptionTextarea.disabled = false; // Admin pode mudar descrição
-            } else { // User
-                toggleTechnicianFields(false); // Usuário não pode editar campos do técnico
-                clientIdSelect.disabled = true; // Usuário não pode mudar cliente
-                equipmentIdSelect.disabled = true; // Usuário não pode mudar equipamento
-                problemDescriptionTextarea.disabled = true; // Usuário não pode mudar descrição
-            }
+            // Habilita/desabilita campos e botões com base no perfil e modo de edição
+            const isUser = loggedInUserProfile === 'user';
+            const isAdminOrTech = loggedInUserProfile === 'admin' || loggedInUserProfile === 'technician';
 
-            // Botões de ação
-            saveButton.style.display = 'none';
-            editButton.style.display = 'inline-block';
+            // Campos do Ticket (Cliente pode ver, Admin/Tech pode editar)
+            clientIdSelect.disabled = isUser;
+            equipmentIdSelect.disabled = isUser;
+            problemDescriptionTextarea.disabled = isUser;
+
+            // Campos de Atendimento (Apenas Admin/Tech pode editar)
+            technicianIdSelect.disabled = isUser;
+            scheduledDateInput.disabled = isUser;
+            serviceDateInput.disabled = isUser;
+            diagnosisTextarea.disabled = isUser;
+            solutionTextarea.disabled = isUser;
+            hasWarrantyTicketSelect.disabled = isUser;
+            warrantyEndDateTicketInput.disabled = isUser || (hasWarrantyTicketSelect.value !== 'Sim');
+            billingDueDateInput.disabled = isUser;
+            statusSelect.disabled = isUser;
+
+            // Campos de Produtos (Apenas Admin/Tech pode editar)
+            productIdSelect.disabled = isUser;
+            productQuantityInput.disabled = isUser;
+            productDiscountInput.disabled = isUser;
+            addProductBtn.disabled = isUser;
+            productsTableBody.querySelectorAll('.remove-product-btn').forEach(btn => btn.disabled = isUser);
+
+            // Botões de Ação
+            saveButton.style.display = 'none'; // Salvar só para novo ticket
+            editButton.style.display = 'inline-block'; // Editar para atualizar
             deleteButton.style.display = 'inline-block';
             cancelButton.style.display = 'inline-block';
 
-            editingTicketId = id;
             formMessage.textContent = '';
-
-            toggleWarrantyEndDateTicketField(); // Atualiza visibilidade da garantia do ticket
+        } else {
+            alert('Ticket não encontrado.');
         }
     };
 
-    // Função para excluir um ticket
+    // Exclui um ticket
     const deleteTicket = (id) => {
-        if (confirm(`Tem certeza que deseja excluir o ticket "${id}"?`)) {
+        if (confirm(`Tem certeza que deseja excluir o ticket ${id}?`)) {
             let tickets = loadTickets();
             delete tickets[id];
             saveTickets(tickets);
-            renderTicketGrid();
-            resetForm();
-            formMessage.textContent = `Ticket "${id}" excluído com sucesso.`;
+            formMessage.textContent = `Ticket "${id}" excluído com sucesso!`;
             formMessage.classList.remove('error-message');
             formMessage.classList.add('success-message');
+            renderTicketGrid();
+            resetForm();
         }
-    };
-
-    // Função para resetar o formulário e o estado de edição
-    const resetForm = () => {
-        ticketForm.reset();
-        ticketIdInput.disabled = true; // ID sempre desabilitado
-        openingDateInput.disabled = true; // Data de abertura sempre desabilitada
-        sectorInput.disabled = true;
-        terminalInput.disabled = true;
-        equipmentNumberInput.disabled = true;
-
-        // Gera um novo ID e preenche a data de abertura
-        ticketIdInput.value = `TICKET-${Date.now()}`;
-        openingDateInput.valueAsDate = new Date();
-
-        // Habilita/desabilita campos com base no perfil para novo ticket
-        if (loggedInUserProfile === 'admin' || loggedInUserProfile === 'technician') {
-            clientIdSelect.disabled = false;
-            equipmentIdSelect.disabled = false;
-            problemDescriptionTextarea.disabled = false;
-            toggleTechnicianFields(true); // Admin/Técnico podem preencher tudo
-        } else { // User
-            clientIdSelect.disabled = false;
-            equipmentIdSelect.disabled = false;
-            problemDescriptionTextarea.disabled = false;
-            toggleTechnicianFields(false); // Usuário não pode preencher campos do técnico
-        }
-
-        saveButton.style.display = 'inline-block';
-        editButton.style.display = 'none';
-        deleteButton.style.display = 'none';
-        cancelButton.style.display = 'none';
-
-        editingTicketId = null;
-        formMessage.textContent = '';
-
-        populateEquipmentSelect(); // Limpa e repopula equipamentos
-        toggleWarrantyEndDateTicketField(); // Esconde o campo de data de garantia do ticket
     };
 
     // --- Inicialização e Event Listeners ---
@@ -297,6 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Popula selects e renderiza grid ao carregar a página
     populateClientSelect();
     populateTechnicianSelect();
+    populateProductSelect(); 
     renderTicketGrid();
 
     // Verifica se há um ticket para edição vindo do dashboard
@@ -312,6 +424,12 @@ document.addEventListener('DOMContentLoaded', () => {
     clientIdSelect.addEventListener('change', populateEquipmentSelect);
     equipmentIdSelect.addEventListener('change', updateEquipmentDetails);
     hasWarrantyTicketSelect.addEventListener('change', toggleWarrantyEndDateTicketField);
+
+    // Event listeners para a seção de produtos
+    productIdSelect.addEventListener('change', updateProductPriceFields);
+    productQuantityInput.addEventListener('input', updateProductPriceFields);
+    productDiscountInput.addEventListener('input', updateProductPriceFields); // NOVO: Evento para o campo de desconto
+    addProductBtn.addEventListener('click', addProductToTicket);
 
     // Event Listener para o formulário (Salvar/Atualizar)
     ticketForm.addEventListener('submit', (event) => {
@@ -368,7 +486,8 @@ document.addEventListener('DOMContentLoaded', () => {
             hasWarrantyTicket,
             warrantyEndDateTicket: hasWarrantyTicket === 'Sim' ? warrantyEndDateTicket : '',
             billingDueDate,
-            status
+            status,
+            productsSold: currentTicketProducts 
         };
 
         if (editingTicketId === null) { // Modo de Cadastro (novo ticket)
@@ -390,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 formMessage.textContent = 'Erro: Ticket não encontrado para atualização.';
                 formMessage.classList.remove('success-message');
-                formMessage.classList.add('error-message');
+                formMessage.classList.add('error-error');
                 return;
             }
         }
