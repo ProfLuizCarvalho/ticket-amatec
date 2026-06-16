@@ -1,43 +1,22 @@
--- =====================================================================================
--- SCRIPT SQL PARA CRIAÇÃO DA BASE DE DADOS - SISTEMA INNER AI
--- SGBD: MySQL
--- Nomes de tabelas e campos em português com prefixo de 3 letras da tabela
--- Chaves Primárias padronizadas como 'id_(nome_da_tabela)'
--- =====================================================================================
+CREATE DATABASE IF NOT EXISTS `AmaTicket` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `AmaTicket`;
 
--- 1. Criação do Banco de Dados (se não existir)
--- Recomenda-se criar um banco de dados específico para a aplicação.
--- USE ESTA LINHA SE VOCÊ QUISER CRIAR O BANCO DE DADOS AUTOMATICAMENTE
--- CREATE DATABASE IF NOT EXISTS `sistema_inner_ai` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- USE `sistema_inner_ai`;
-
--- OU, se você já tem um banco de dados criado, apenas selecione-o:
--- USE `seu_nome_do_banco_de_dados`;
-
--- =====================================================================================
--- 2. Tabela de Usuários
--- Prefixo: usu_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `usuarios` (
     `id_usuarios` VARCHAR(50) PRIMARY KEY NOT NULL, -- Chave Primária padronizada
     `usu_nome_usuario` VARCHAR(100) UNIQUE NOT NULL,
-    `usu_senha` VARCHAR(255) NOT NULL,
-    `usu_perfil` ENUM('admin', 'tecnico', 'cliente') NOT NULL,
+    `usu_senha` VARCHAR(255) NOT NULL, -- Senha hash (nunca armazene senhas em texto puro!)
+    `usu_perfil` ENUM('admin', 'tecnico', 'cliente') NOT NULL, -- Perfil do usuário
     `usu_email` VARCHAR(255) UNIQUE,
     `usu_criado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `usu_atualizado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- =====================================================================================
--- 3. Tabela de Clientes
--- Prefixo: cli_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `clientes` (
     `id_clientes` VARCHAR(50) PRIMARY KEY NOT NULL, -- Chave Primária padronizada
     `cli_id_usuario` VARCHAR(50) UNIQUE, -- Chave estrangeira para a tabela usuarios
-    `cli_nome_cliente` VARCHAR(255) NOT NULL,
-    `cli_nome_fantasia` VARCHAR(255),
-    `cli_documento_id` VARCHAR(20) UNIQUE,
+    `cli_nome_cliente` VARCHAR(255) NOT NULL, -- Nome completo ou Razão Social
+    `cli_nome_fantasia` VARCHAR(255), -- Nome Fantasia (se PJ)
+    `cli_documento_id` VARCHAR(20) UNIQUE, -- CPF/CNPJ
     `cli_pessoa_contato` VARCHAR(255),
     `cli_telefone` VARCHAR(20),
     `cli_email` VARCHAR(255) UNIQUE,
@@ -50,10 +29,6 @@ CREATE TABLE IF NOT EXISTS `clientes` (
     FOREIGN KEY (`cli_id_usuario`) REFERENCES `usuarios`(`id_usuarios`) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- =====================================================================================
--- 4. Tabela de Técnicos
--- Prefixo: tec_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `tecnicos` (
     `id_tecnicos` VARCHAR(50) PRIMARY KEY NOT NULL, -- Chave Primária padronizada
     `tec_id_usuario` VARCHAR(50) UNIQUE NOT NULL, -- Chave estrangeira para a tabela usuarios
@@ -66,25 +41,17 @@ CREATE TABLE IF NOT EXISTS `tecnicos` (
     FOREIGN KEY (`tec_id_usuario`) REFERENCES `usuarios`(`id_usuarios`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================================
--- 5. Tabela de Produtos/Serviços
--- Prefixo: pro_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `produtos` (
     `id_produtos` VARCHAR(50) PRIMARY KEY NOT NULL, -- Chave Primária padronizada
     `pro_nome_produto` VARCHAR(255) NOT NULL,
     `pro_descricao` TEXT,
     `pro_preco_unitario` DECIMAL(10, 2) NOT NULL,
     `pro_tipo_produto` ENUM('produto', 'servico') NOT NULL,
-    `pro_quantidade_estoque` INT DEFAULT 0,
+    `pro_quantidade_estoque` INT DEFAULT 0, -- Para produtos físicos
     `pro_criado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `pro_atualizado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- =====================================================================================
--- 6. Tabela de Equipamentos
--- Prefixo: equ_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `equipamentos` (
     `id_equipamentos` VARCHAR(50) PRIMARY KEY NOT NULL, -- Chave Primária padronizada
     `equ_id_cliente` VARCHAR(50) NOT NULL, -- Chave estrangeira para a tabela clientes
@@ -100,24 +67,18 @@ CREATE TABLE IF NOT EXISTS `equipamentos` (
     FOREIGN KEY (`equ_id_cliente`) REFERENCES `clientes`(`id_clientes`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================================
--- 7. Tabela de Tickets
--- Prefixo: tic_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `tickets` (
     `id_tickets` VARCHAR(50) PRIMARY KEY NOT NULL, -- Chave Primária padronizada
-    `tic_id_cliente` VARCHAR(50) NOT NULL, -- Chave estrangeira para o cliente que abriu o ticket
-    `tic_id_equipamento` VARCHAR(50), -- Chave estrangeira para o equipamento relacionado
-    `tic_id_tecnico` VARCHAR(50), -- Chave estrangeira para o técnico atribuído
+    `tic_id_cliente` VARCHAR(50) NOT NULL, -- Cliente que abriu o ticket
+    `tic_id_equipamento` VARCHAR(50), -- Equipamento relacionado ao ticket (opcional)
+    `tic_id_tecnico` VARCHAR(50), -- Técnico atribuído ao ticket (opcional)
     `tic_descricao_problema` TEXT NOT NULL,
-    `tic_status` ENUM('Pendente', 'Em Andamento', 'Aguardando Peça', 'Finalizada', 'Cancelada', 'Faturada') NOT NULL DEFAULT 'Pendente',
+    `tic_observacoes_tecnicas` TEXT,
+    `tic_status` ENUM('Aberto', 'Em Andamento', 'Pendente', 'Concluído', 'Cancelado') DEFAULT 'Aberto',
     `tic_prioridade` ENUM('Baixa', 'Média', 'Alta', 'Urgente') DEFAULT 'Média',
     `tic_data_abertura` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `tic_data_agendamento` DATETIME,
-    `tic_data_servico` DATETIME,
-    `tic_diagnostico` TEXT,
-    `tic_solucao` TEXT,
-    `tic_data_fechamento` DATETIME,
+    `tic_data_atribuicao` TIMESTAMP,
+    `tic_data_conclusao` TIMESTAMP,
     `tic_criado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `tic_atualizado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`tic_id_cliente`) REFERENCES `clientes`(`id_clientes`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -125,45 +86,31 @@ CREATE TABLE IF NOT EXISTS `tickets` (
     FOREIGN KEY (`tic_id_tecnico`) REFERENCES `tecnicos`(`id_tecnicos`) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- =====================================================================================
--- 8. Tabela de Itens de Ticket
--- Prefixo: itt_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `itens_ticket` (
     `id_itens_ticket` INT AUTO_INCREMENT PRIMARY KEY, -- Chave Primária padronizada
     `itt_id_ticket` VARCHAR(50) NOT NULL,
     `itt_id_produto` VARCHAR(50) NOT NULL,
     `itt_quantidade` INT NOT NULL,
-    `itt_preco_unitario_venda` DECIMAL(10, 2) NOT NULL,
-    `itt_percentual_desconto` DECIMAL(5, 2) DEFAULT 0.00,
+    `itt_preco_unitario_venda` DECIMAL(10, 2) NOT NULL, -- Preço do produto no momento da venda/uso
     `itt_subtotal_com_desconto` DECIMAL(10, 2) NOT NULL,
     `itt_criado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`itt_id_ticket`) REFERENCES `tickets`(`id_tickets`) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (`itt_id_produto`) REFERENCES `produtos`(`id_produtos`) ON DELETE RESTRICT ON UPDATE CASCADE
+    FOREIGN KEY (`itt_id_produto`) REFERENCES `produtos`(`id_produtos`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================================
--- 9. Tabela de Faturas
--- Prefixo: fat_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `faturas` (
     `id_faturas` VARCHAR(50) PRIMARY KEY NOT NULL, -- Chave Primária padronizada
-    `fat_id_cliente` VARCHAR(50) NOT NULL, -- Chave estrangeira para o cliente faturado
+    `fat_id_cliente` VARCHAR(50) NOT NULL,
     `fat_data_emissao` DATE NOT NULL,
     `fat_data_vencimento` DATE NOT NULL,
     `fat_total_geral` DECIMAL(10, 2) NOT NULL,
     `fat_metodo_pagamento` VARCHAR(100),
-    `fat_observacoes` TEXT,
-    `fat_status` ENUM('pendente', 'paga', 'vencida', 'cancelada', 'rascunho') NOT NULL DEFAULT 'pendente',
+    `fat_status` ENUM('pendente', 'pago', 'cancelado', 'atrasado') DEFAULT 'pendente',
     `fat_criado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `fat_atualizado_em` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`fat_id_cliente`) REFERENCES `clientes`(`id_clientes`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================================
--- 10. Tabela de Itens de Fatura
--- Prefixo: itf_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `itens_fatura` (
     `id_itens_fatura` INT AUTO_INCREMENT PRIMARY KEY, -- Chave Primária padronizada
     `itf_id_fatura` VARCHAR(50) NOT NULL,
@@ -179,10 +126,6 @@ CREATE TABLE IF NOT EXISTS `itens_fatura` (
     FOREIGN KEY (`itf_id_ticket`) REFERENCES `tickets`(`id_tickets`) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- =====================================================================================
--- 11. Tabela de Associação de Tickets com Faturas
--- Prefixo: fta_
--- =====================================================================================
 CREATE TABLE IF NOT EXISTS `fatura_ticket_associacao` (
     `id_fatura_ticket_associacao` INT AUTO_INCREMENT PRIMARY KEY, -- Chave Primária padronizada
     `fta_id_fatura` VARCHAR(50) NOT NULL,
@@ -191,6 +134,4 @@ CREATE TABLE IF NOT EXISTS `fatura_ticket_associacao` (
     FOREIGN KEY (`fta_id_ticket`) REFERENCES `tickets`(`id_tickets`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Adicionando UNIQUE constraint para a combinação de fta_id_fatura e fta_id_ticket
 ALTER TABLE `fatura_ticket_associacao` ADD UNIQUE (`fta_id_fatura`, `fta_id_ticket`);
-
